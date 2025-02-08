@@ -49,4 +49,18 @@
 #define         Z80_ADDRESS_WIDTH       0xFF
 #define         Z80_BASE_BITMASK        256
 
+
+/*===============================================================================*/
+/*-------------------------------------------------------------------------------*/
+/*                          Z80 MEMORY UTILITY MACROS                            */
+/*                      FOR READING THE BYTE ORDER OF MEMORY                     */
+/*-------------------------------------------------------------------------------*/
+/*              THE FOLLOWING MACROS ARE DESIGNED FOR READING MEMORY             */
+/*                      FROM A PREDEFINED MEMORY MAPPER                          */
+/*-------------------------------------------------------------------------------*/
+/*===============================================================================*/
+
+#define         Z80_READ_BYTE(VALUE, ADDRESS)               (VALUE)[(ADDRESS) ^ 1]
+#define         Z80_READ_WORD(VALUE, ADDRESS)               (((VALUE)[ADDRESS]<<8) | (VALUE)[(ADDRESS)+1])
+
 #endif
