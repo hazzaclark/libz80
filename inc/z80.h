@@ -30,8 +30,23 @@
         #else 
         #define USE_Z80
 
+
+        #if defined(USE_OPCODE)
+        #define USE_OPCODE
+            #else
+        #define USE_OPCODE
+        #include "z80OPCODE.h"
+        #endif
+
 #endif
 
+/*===============================================================================*/
+/*                          Z80 MAIN CPU FUNCTIONALIY							 */
+/*===============================================================================*/
 
+
+#define         Z80_DATA_WIDTH          0xF
+#define         Z80_ADDRESS_WIDTH       0xFF
+#define         Z80_BASE_BITMASK        256
 
 #endif
