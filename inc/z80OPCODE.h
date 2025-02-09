@@ -45,11 +45,32 @@
 
     #define     OPCODE_RLD              0x6f
 
-    #define Z80_MAKE_OPCODE(OP, SIZE) \
-    void OP##_##SIZE(void)
+    #define Z80_MAKE_OPCODE(OP) \
+    void OP(CPU_Z80* const Z, U16 VALUE)
 
+    #define Z80_MAKE_OPCODE_8(OP) \
+    U16 OP(CPU_Z80* const Z)
 
-    U8 Z80_GET_OPCODE_CYCLES(U8, U8);
+    #define Z80_MAKE_OPCODE_16(OP) \
+    U16 OP(CPU_Z80* const Z)
+
+    /*===============================================================================*/
+    /*-------------------------------------------------------------------------------*/
+    //                         Z80 OPCODE PROTOTYPE FUNCTIONS
+    /*-------------------------------------------------------------------------------*/
+    /*===============================================================================*/
+
+    U8 Z80_GET_OPCODE_CYCLES(U8);
+
+    extern bool PARTIY(U8 VALUE)
+    {   
+        U8 BIT_SHIFT = 0;
+
+        for(int INDEX = 0; INDEX < 8; INDEX++)
+        {
+            BIT_SHIFT += ((VALUE >> INDEX) & 1);
+        }
+    }
 
 #endif
 #endif
