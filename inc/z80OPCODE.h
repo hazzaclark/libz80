@@ -45,6 +45,9 @@
 
     #define     OPCODE_RLD              0x6f
 
+    #define Z80_MAKE_OPCODE(OP, SIZE) \
+    void OP##_##SIZE(void)
+
 
     U8 Z80_GET_OPCODE_CYCLES(U8, U8);
 
