@@ -102,4 +102,15 @@
 #define         Z80_P_FLAG              Z80_PV_FLAG
 #define         Z80_V_FLAG              Z80_PV_FLAG
 
+typedef struct Z80_MEMORY
+{
+    unsigned(*MEMORY_BASE);
+    U8* READ_8;
+    U16* READ_16;
+    U8* WRITE_8;
+    U16* WRITE_16;
+
+} Z80_MEMORY;
+
+
 #endif
