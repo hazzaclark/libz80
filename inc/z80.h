@@ -112,5 +112,27 @@ typedef struct Z80_MEMORY
 
 } Z80_MEMORY;
 
+typedef struct CPU_Z80
+{
+    struct Z80_MEMORY* Z80_MEM[Z80_BASE_BITMASK];
+
+    U16 CYCLES;
+    U16 PC;
+    U16 SP;
+
+    U8 INTERRUPT_VECTOR;
+    U8 MEMORY_REFRESH;
+
+} CPU_Z80;
+
+
+#define     Z80_MEMORY_BASE             CPU.Z80_MEM
+#define     Z80_MASTER_CYCLES           CPU.CYCLES
+#define     Z80_PC                      CPU.PC
+#define     Z80_SP                      CPU.SP
+#define     Z80_IRQ                     CPU.INTERRUPT_VECTOR
+#define     Z80_REF                     CPU.MEMORY_REFRESH
+
+static CPU_Z80 CPU;
 
 #endif
