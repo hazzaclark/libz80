@@ -63,8 +63,17 @@
 #define         Z80_READ_BYTE(VALUE, ADDRESS)               (VALUE)[(ADDRESS) ^ 1]
 #define         Z80_READ_WORD(VALUE, ADDRESS)               (((VALUE)[ADDRESS]<<8) | (VALUE)[(ADDRESS)+1])
 
+#define         Z80_WRITE_BYTE(VALUE, ADDRESS, DATA)        (VALUE)[(ADDRESS) ^ 1] = (DATA)
+
+#define         Z80_WRITE_WORD(MEM, ADDRESS, DATA) do { \
+                (MEM)[(ADDRESS)] = ((DATA) >> 8) & 0xFF; \
+                (MEM)[(ADDRESS) + 1] = (DATA) & 0xFF; \
+                } while(0)
+
 #define         Z80_LOW_NIBBLE(VALUE)
 #define         Z80_HIGH_NIBBLE(VALUE)                             ((VALUE >> 9) << 16)
+
+#define         Z80_GET_BIT(NTH, VALUE)                     (((VALUE) >> (NTH)) & 1)
 
 #define         Z80_B                   0
 #define         Z80_C                   1
