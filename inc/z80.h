@@ -115,13 +115,14 @@
 #define         IS_BIT_SET(VALUE, BIT)      (!!((VALUE) & (1 << (BIT))))
 
 
-#define         Z80_PAIR(HI, LO)                        ((HI << 8) | (LO))
-#define         Z80_SET_PAIR(HI, LO, VALUE)             HI = ((VALUE) >> 8) & 0xFF; LO = (VALUE) & 0xFF
+#define         Z80_GET_PAIR(Z80, HI, LO) \
+                ((Z80_GET_REGISTERS(Z80, HI) << 8) | Z80_GET_REGISTERS(Z80, LO))
 
-#define         Z80_SET_REG_BC(VALUE) Z80_SET_PAIR(Z80_B, Z80_C, VALUE)
-#define         Z80_SET_REG_DE(VALUE) Z80_SET_PAIR(Z80_D, Z80_E, VALUE)
-#define         Z80_SET_REG_HL(VALUE) Z80_SET_PAIR(Z80_H, Z80_L, VALUE)
-#define         Z80_SET_REG_AF(VALUE) Z80_A = (((VALUE) >> 8) & 0xFF);
+                #define Z80_SET_PAIR(Z80, HI, LO, VALUE) \
+                do { \
+                    Z80_SET_REGISTERS(Z80, HI, ((VALUE) >> 8) & 0xFF); \
+                    Z80_SET_REGISTERS(Z80, LO, (VALUE) & 0xFF); \
+                } while (0)
 
 /*===============================================================================*/
 /*-------------------------------------------------------------------------------*/
@@ -189,6 +190,7 @@ void Z80_OUTPUT(CPU_Z80* const Z80);
 void Z80_EXEC(CPU_Z80* const Z80, U8 OPCODE);
 
 unsigned Z80_GET_REGISTERS(CPU_Z80* const Z80, int REGISTER);
+void Z80_SET_REGISTERS(CPU_Z80* const Z80, int REGISTER, U8 VALUE);
 void Z80_STEP(CPU_Z80* const Z80);
 void Z80_GEN_NMI(CPU_Z80* const Z80);
 void Z80_GEN_INT_DATA(CPU_Z80* const Z80);
