@@ -54,6 +54,9 @@
     #define Z80_MAKE_OPCODE_16(OP) \
     U16 OP(CPU_Z80* const Z)
 
+    #define Z80_MAKE_OPCODE_IMM(OP) \
+    void OP(CPU_Z80* const Z)
+
     /*===============================================================================*/
     /*-------------------------------------------------------------------------------*/
     //                         Z80 OPCODE PROTOTYPE FUNCTIONS
@@ -62,7 +65,7 @@
 
     U8 Z80_GET_OPCODE_CYCLES(U8);
 
-    extern bool PARTIY(U8 VALUE)
+    extern U8 PARTIY(U8 VALUE)
     {   
         U8 BIT_SHIFT = 0;
 
@@ -70,6 +73,8 @@
         {
             BIT_SHIFT += ((VALUE >> INDEX) & 1);
         }
+
+        return BIT_SHIFT;
     }
 
 #endif
