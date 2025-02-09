@@ -115,7 +115,7 @@ typedef struct Z80_MEMORY
 
 typedef struct CPU_Z80
 {
-    struct Z80_MEMORY** Z80_MEM[Z80_BASE_BITMASK];
+    struct Z80_MEMORY Z80_MEM[Z80_BASE_BITMASK];
 
     U16 CYCLES;
     U16 PC;
@@ -131,20 +131,6 @@ typedef struct CPU_Z80
     unsigned NMI_PENDING : 1;
 
 } CPU_Z80;
-
-
-#define     Z80_MEMORY_BASE             CPU.Z80_MEM
-#define     Z80_MASTER_CYCLES           CPU.CYCLES
-#define     Z80_PC                      CPU.PC
-#define     Z80_SP                      CPU.SP
-#define     Z80_IRQ                     CPU.INTERRUPT_VECTOR
-#define     Z80_IRQ_MODE                CPU.IRQ_MODE
-#define     Z80_REF                     CPU.MEMORY_REFRESH
-#define     Z80_HALT                    CPU.HALT
-#define     Z80_INT_PEND                CPU.INT_PENDING
-#define     Z80_NMI                     CPU.NMI_PENDING
-
-static CPU_Z80 CPU;
 
 /*===============================================================================*/
 /*-------------------------------------------------------------------------------*/
@@ -172,5 +158,9 @@ extern void Z80_WRITE_WORD(Z80_MEMORY* const Z, U16 ADDR, U8 VAL)
     Z->WRITE_8(Z->USER_DATA, ADDR, VAL & 0xFF);
     Z->WRITE_8(Z->USER_DATA, ADDR + 1, VAL >> 8);
 }
+
+
+
+void Z80_INIT(CPU_Z80* const Z80);
 
 #endif
