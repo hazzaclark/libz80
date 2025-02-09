@@ -23,14 +23,14 @@
 
 Z80_MAKE_OPCODE(PUSHW)
 {
-    Z80_SP -= 2;
-    Z80_WRITE_WORD(Z80_MEMORY_BASE, Z80_SP, VALUE);
+    Z->SP -= 2;
+    Z80_WRITE_WORD(Z->Z80_MEM, Z->SP, VALUE);
 }
 
 Z80_MAKE_OPCODE_16(POPW)
 {
-    Z80_SP -= 2;
-    return Z80_READ_WORD(Z80_MEMORY_BASE, Z80_SP - 2);
+    Z->SP -= 2;
+    return Z80_READ_WORD(Z->Z80_MEM, Z->SP - 2);
 }
 
 #endif
