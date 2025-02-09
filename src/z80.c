@@ -16,8 +16,8 @@
 
 unsigned Z80_GET_REGISTERS(CPU_Z80* const Z80, int REGISTER)
 {
-    	/* IF THERE IS NO ACCESSIBLE METHODS */
-	/* WE SPECIFICALLY ALLOCATE MEMORY SAID ACCESSING OF REGISTERS */
+    /* IF THERE IS NO ACCESSIBLE METHODS */
+    /* WE SPECIFICALLY ALLOCATE MEMORY SAID ACCESSING OF REGISTERS */
 
     switch (REGISTER)
     {
@@ -38,6 +38,28 @@ unsigned Z80_GET_REGISTERS(CPU_Z80* const Z80, int REGISTER)
 
         default:
             return 0;
+    }
+}
+
+void Z80_SET_REGISTERS(CPU_Z80* const Z80, int REGISTER, U8 VALUE)
+{
+    switch (REGISTER) 
+    {
+        case Z80_B: Z80->REGISTER_BASE[Z80_B] = VALUE; break;
+        case Z80_C: Z80->REGISTER_BASE[Z80_C] = VALUE; break;
+        case Z80_D: Z80->REGISTER_BASE[Z80_D] = VALUE; break;
+        case Z80_E: Z80->REGISTER_BASE[Z80_E] = VALUE; break;
+        case Z80_H: Z80->REGISTER_BASE[Z80_E] = VALUE; break;
+        case Z80_L: Z80->REGISTER_BASE[Z80_L] = VALUE; break;
+        case Z80_A: Z80->REGISTER_BASE[Z80_A] = VALUE; break;
+        case Z80_F: Z80->REGISTER_BASE[Z80_F] = VALUE; break;
+        case Z80_IXH: Z80->REGISTER_BASE[Z80_IXH] = VALUE; break;
+        case Z80_IXL: Z80->REGISTER_BASE[Z80_IXL] = VALUE; break;
+        case Z80_IYH: Z80->REGISTER_BASE[Z80_IYH] = VALUE; break;
+        case Z80_IYL: Z80->REGISTER_BASE[Z80_IYL] = VALUE; break;
+        case Z80_I: Z80->REGISTER_BASE[Z80->INTERRUPT_VECTOR] = VALUE; break;
+        case Z80_R: Z80->REGISTER_BASE[Z80->MEMORY_REFRESH] = VALUE; break;
+        default: break; 
     }
 }
 
