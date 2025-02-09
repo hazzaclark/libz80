@@ -60,12 +60,6 @@
 /*-------------------------------------------------------------------------------*/
 /*===============================================================================*/
 
-#define         Z80_WRITE_BYTE(VALUE, ADDRESS, DATA)        (VALUE)[(ADDRESS) ^ 1] = (DATA)
-#define         Z80_WRITE_WORD(MEM, ADDRESS, DATA) do { \
-                (MEM)[(ADDRESS)] = ((DATA) >> 8) & 0xFF; \
-                (MEM)[(ADDRESS) + 1] = (DATA) & 0xFF; \
-                } while(0)
-
 #define         Z80_LOW_NIBBLE(VALUE)
 #define         Z80_HIGH_NIBBLE(VALUE)                             ((VALUE >> 9) << 16)
 
@@ -112,8 +106,8 @@ typedef struct Z80_MEMORY
     unsigned(*MEMORY_BASE);
     U8(*READ_8)(void*, U16);
     U16* READ_16;
-    U8* WRITE_8;
-    U16(*WRITE_16)(void*, U16);
+    void(*WRITE_8)(void*, U16, U8);
+    void(*WRITE_16)(void*, U16, U8);
 
     void* USER_DATA;
 
@@ -121,7 +115,7 @@ typedef struct Z80_MEMORY
 
 typedef struct CPU_Z80
 {
-    struct Z80_MEMORY* Z80_MEM[Z80_BASE_BITMASK];
+    struct Z80_MEMORY** Z80_MEM[Z80_BASE_BITMASK];
 
     U16 CYCLES;
     U16 PC;
@@ -154,18 +148,29 @@ static CPU_Z80 CPU;
 
 /*===============================================================================*/
 /*-------------------------------------------------------------------------------*/
-//                          Z80 EXTERNAL READ FUNCTIONS
+//                      Z80 EXTERNAL READ AND WRITE FUNCTIONS
 /*-------------------------------------------------------------------------------*/
 /*===============================================================================*/
 
-extern inline U8 Z80_READ_BYTE(Z80_MEMORY* const Z, U16 ADDR)
+extern U8 Z80_READ_BYTE(Z80_MEMORY* const Z, U16 ADDR)
 {
     return Z->READ_8(Z->USER_DATA, ADDR);
 }
 
-extern inline U16 Z80_READ_WORD(Z80_MEMORY* const Z, U16 ADDR)
+extern U16 Z80_READ_WORD(Z80_MEMORY* const Z, U16 ADDR)
 {
     return (Z->READ_8(Z->USER_DATA, ADDR + 1) << 8) | Z->READ_8(Z->USER_DATA, ADDR);
+}
+
+extern void Z80_WRITE_BYTE(Z80_MEMORY* const Z, U16 ADDR, U8 VAL)
+{
+    Z->WRITE_8(Z->USER_DATA, ADDR, VAL);
+}
+
+extern void Z80_WRITE_WORD(Z80_MEMORY* const Z, U16 ADDR, U8 VAL)
+{
+    Z->WRITE_8(Z->USER_DATA, ADDR, VAL & 0xFF);
+    Z->WRITE_8(Z->USER_DATA, ADDR + 1, VAL >> 8);
 }
 
 #endif
