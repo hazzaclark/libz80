@@ -110,6 +110,10 @@
 #define         CALC_VFLAG_16(ADDRESS, VALUE, RESULT) \
     (((ADDRESS & 0x8000) == (VALUE & 0x8000)) && ((ADDRESS & 0x8000) != (RESULT & 0x8000)))
 
+// MACRO FOR SETTING THE BIT SHIFT BETWEEN LOGICAL BITS 3 AND 5
+
+#define         IS_BIT_SET(VALUE, BIT)      (!!((VALUE) & (1 << (BIT))))
+
 /*===============================================================================*/
 /*-------------------------------------------------------------------------------*/
 //                          Z80 MAIN FUNCTIONALITY
