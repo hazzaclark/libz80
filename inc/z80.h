@@ -123,6 +123,12 @@ typedef struct CPU_Z80
     U8 INTERRUPT_VECTOR;
     U8 MEMORY_REFRESH;
 
+    U8 IRQ_MODE;
+
+    unsigned HALT : 1;
+    unsigned INT_PENDING : 1;
+    unsigned NMI_PENDING : 1;
+
 } CPU_Z80;
 
 
@@ -131,7 +137,11 @@ typedef struct CPU_Z80
 #define     Z80_PC                      CPU.PC
 #define     Z80_SP                      CPU.SP
 #define     Z80_IRQ                     CPU.INTERRUPT_VECTOR
+#define     Z80_IRQ_MODE                CPU.IRQ_MODE
 #define     Z80_REF                     CPU.MEMORY_REFRESH
+#define     Z80_HALT                    CPU.HALT
+#define     Z80_INT_PEND                CPU.INT_PENDING
+#define     Z80_NMI                     CPU.NMI_PENDING
 
 static CPU_Z80 CPU;
 
