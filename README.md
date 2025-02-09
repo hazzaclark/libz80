@@ -35,7 +35,7 @@ libz80.so
 
 the makefile in question is universal, allowing for ease of use compiling on other systems
 
-### Resources:
+# Resources:
 
 [Z80 PROGRAMMER MANUAL](https://www.zilog.com/docs/z80/um0080.pdf)
 
