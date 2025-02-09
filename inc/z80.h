@@ -114,6 +114,15 @@
 
 #define         IS_BIT_SET(VALUE, BIT)      (!!((VALUE) & (1 << (BIT))))
 
+
+#define         Z80_PAIR(HI, LO)                        ((HI << 8) | (LO))
+#define         Z80_SET_PAIR(HI, LO, VALUE)             HI = ((VALUE) >> 8) & 0xFF; LO = (VALUE) & 0xFF
+
+#define         Z80_SET_REG_BC(VALUE) Z80_SET_PAIR(Z80_B, Z80_C, VALUE)
+#define         Z80_SET_REG_DE(VALUE) Z80_SET_PAIR(Z80_D, Z80_E, VALUE)
+#define         Z80_SET_REG_HL(VALUE) Z80_SET_PAIR(Z80_H, Z80_L, VALUE)
+#define         Z80_SET_REG_AF(VALUE) Z80_A = (((VALUE) >> 8) & 0xFF);
+
 /*===============================================================================*/
 /*-------------------------------------------------------------------------------*/
 //                          Z80 MAIN FUNCTIONALITY
