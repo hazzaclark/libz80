@@ -60,11 +60,7 @@
 /*-------------------------------------------------------------------------------*/
 /*===============================================================================*/
 
-#define         Z80_READ_BYTE(VALUE, ADDRESS)               (VALUE)[(ADDRESS) ^ 1]
-#define         Z80_READ_WORD(VALUE, ADDRESS)               (((VALUE)[ADDRESS]<<8) | (VALUE)[(ADDRESS)+1])
-
 #define         Z80_WRITE_BYTE(VALUE, ADDRESS, DATA)        (VALUE)[(ADDRESS) ^ 1] = (DATA)
-
 #define         Z80_WRITE_WORD(MEM, ADDRESS, DATA) do { \
                 (MEM)[(ADDRESS)] = ((DATA) >> 8) & 0xFF; \
                 (MEM)[(ADDRESS) + 1] = (DATA) & 0xFF; \
@@ -73,7 +69,7 @@
 #define         Z80_LOW_NIBBLE(VALUE)
 #define         Z80_HIGH_NIBBLE(VALUE)                             ((VALUE >> 9) << 16)
 
-#define         Z80_GET_BIT(NTH, VALUE)                     (((VALUE) >> (NTH)) & 1)
+#define         Z80_GET_BIT(NTH, VALUE)                            (((VALUE) >> (NTH)) & 1)
 
 #define         Z80_B                   0
 #define         Z80_C                   1
@@ -114,10 +110,12 @@
 typedef struct Z80_MEMORY
 {
     unsigned(*MEMORY_BASE);
-    U8* READ_8;
+    U8(*READ_8)(void*, U16);
     U16* READ_16;
     U8* WRITE_8;
-    U16* WRITE_16;
+    U16(*WRITE_16)(void*, U16);
+
+    void* USER_DATA;
 
 } Z80_MEMORY;
 
@@ -153,5 +151,21 @@ typedef struct CPU_Z80
 #define     Z80_NMI                     CPU.NMI_PENDING
 
 static CPU_Z80 CPU;
+
+/*===============================================================================*/
+/*-------------------------------------------------------------------------------*/
+//                          Z80 EXTERNAL READ FUNCTIONS
+/*-------------------------------------------------------------------------------*/
+/*===============================================================================*/
+
+extern inline U8 Z80_READ_BYTE(Z80_MEMORY* const Z, U16 ADDR)
+{
+    return Z->READ_8(Z->USER_DATA, ADDR);
+}
+
+extern inline U16 Z80_READ_WORD(Z80_MEMORY* const Z, U16 ADDR)
+{
+    return (Z->READ_8(Z->USER_DATA, ADDR + 1) << 8) | Z->READ_8(Z->USER_DATA, ADDR);
+}
 
 #endif
