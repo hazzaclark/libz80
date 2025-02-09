@@ -103,6 +103,19 @@
 #define         Z80_P_FLAG              Z80_PV_FLAG
 #define         Z80_V_FLAG              Z80_PV_FLAG
 
+
+#define         CALC_VFLAG_8(ADDRESS, VALUE, RESULT) \
+    (((ADDRESS & 0x80) == (VALUE & 0x80)) && ((ADDRESS & 0x80) != (RESULT & 0x80)))
+
+#define         CALC_VFLAG_16(ADDRESS, VALUE, RESULT) \
+    (((ADDRESS & 0x8000) == (VALUE & 0x8000)) && ((ADDRESS & 0x8000) != (RESULT & 0x8000)))
+
+/*===============================================================================*/
+/*-------------------------------------------------------------------------------*/
+//                          Z80 MAIN FUNCTIONALITY
+/*-------------------------------------------------------------------------------*/
+/*===============================================================================*/
+
 typedef struct Z80_MEMORY
 {
     unsigned(*MEMORY_BASE);
@@ -134,6 +147,20 @@ typedef struct CPU_Z80
 
     U16 REGISTER_BASE[16];
 
+    struct 
+    {
+        unsigned FLAG_C : 1;
+        unsigned FLAG_N : 1;
+        unsigned FLAG_P : 1;
+        unsigned FLAG_B3 : 1;
+        unsigned FLAG_H : 1;
+        unsigned FLAG_B5 : 1;
+        unsigned FLAG_Z : 1;
+        unsigned FLAG_S : 1;            
+
+    } FLAGS;
+    
+
 } CPU_Z80;
 
 /*===============================================================================*/
@@ -143,7 +170,10 @@ typedef struct CPU_Z80
 /*===============================================================================*/
 
 void Z80_INIT(CPU_Z80* const Z80);
+void Z80_RUN(CPU_Z80* const Z80);
 void Z80_OUTPUT(CPU_Z80* const Z80);
+
+void Z80_EXEC(CPU_Z80* const Z80, U8 OPCODE);
 
 unsigned Z80_GET_REGISTERS(CPU_Z80* const Z80, int REGISTER);
 void Z80_STEP(CPU_Z80* const Z80);
@@ -175,6 +205,11 @@ extern void Z80_WRITE_WORD(Z80_MEMORY* const Z, U16 ADDR, U8 VAL)
 {
     Z->WRITE_8(Z->USER_DATA, ADDR, VAL & 0xFF);
     Z->WRITE_8(Z->USER_DATA, ADDR + 1, VAL >> 8);
+}
+
+extern void Z80_INCR_READ(CPU_Z80* const Z80)
+{
+    Z80->MEMORY_REFRESH = (Z80->MEMORY_REFRESH & 0x80) | ((Z80->MEMORY_REFRESH + 1) & 0x7F);
 }
 
 #endif
