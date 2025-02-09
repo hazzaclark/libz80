@@ -77,6 +77,8 @@
 #define         Z80_IXL                 9
 #define         Z80_IYH                 10  
 #define         Z80_IYL                 11
+#define         Z80_I                   12
+#define         Z80_R                   13
 
 #define         Z80_S_FLAG_SHIFT        7       
 #define         Z80_Z_FLAG_SHIFT        6
@@ -130,7 +132,23 @@ typedef struct CPU_Z80
     unsigned INT_PENDING : 1;
     unsigned NMI_PENDING : 1;
 
+    U16 REGISTER_BASE[16];
+
 } CPU_Z80;
+
+/*===============================================================================*/
+/*-------------------------------------------------------------------------------*/
+//                          Z80 FUNCTION PROTOTYPES
+/*-------------------------------------------------------------------------------*/
+/*===============================================================================*/
+
+void Z80_INIT(CPU_Z80* const Z80);
+void Z80_OUTPUT(CPU_Z80* const Z80);
+
+unsigned Z80_GET_REGISTERS(CPU_Z80* const Z80, int REGISTER);
+void Z80_STEP(CPU_Z80* const Z80);
+void Z80_GEN_NMI(CPU_Z80* const Z80);
+void Z80_GEN_INT_DATA(CPU_Z80* const Z80);
 
 /*===============================================================================*/
 /*-------------------------------------------------------------------------------*/
@@ -158,9 +176,5 @@ extern void Z80_WRITE_WORD(Z80_MEMORY* const Z, U16 ADDR, U8 VAL)
     Z->WRITE_8(Z->USER_DATA, ADDR, VAL & 0xFF);
     Z->WRITE_8(Z->USER_DATA, ADDR + 1, VAL >> 8);
 }
-
-
-
-void Z80_INIT(CPU_Z80* const Z80);
 
 #endif
