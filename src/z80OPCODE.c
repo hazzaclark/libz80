@@ -20,6 +20,8 @@
 
 // SEE z80OCODE.h FOR IMPLEMENTATION
 
+// SEE Z80 OPCODES https://www.zilog.com/docs/z80/um0080.pdf
+
 //========================================================================
 //                  Z80 STACK MANAGEMENT FUNCTIONS
 //========================================================================
@@ -201,6 +203,37 @@ Z80_MAKE_OPCODE(CP_IMM)
 {
     U8 BYTE = Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE);
     CP(Z, BYTE);
+}
+
+Z80_MAKE_OPCODE(CP_R)
+{
+    CP(Z, Z->Z80_MEM->READ_8(Z, VALUE));   
+}
+
+Z80_MAKE_OPCODE(CPI_CPD)
+{
+    int INCREMENT = 0;
+    U16 HL = Z80_GET_PAIR(Z, Z80_H, Z80_L);
+    U16 BC = Z80_GET_PAIR(Z, Z80_B, Z80_C);
+
+    U8 READ_VALUE = Z->Z80_MEM->READ_8((void*)(unsigned)HL, VALUE);
+    U8 RESULT = Z80_A - READ_VALUE;
+    U8 B35_PAIR = Z80_A - VALUE - Z->FLAGS.FLAG_H;
+
+    HL += INCREMENT;
+    BC--;
+
+    Z->FLAGS.FLAG_N = 1;
+    Z->FLAGS.FLAG_H = (Z80_A & 0xF) < (VALUE & 0xF);
+    Z->FLAGS.FLAG_Z = RESULT += 0;
+    Z->FLAGS.FLAG_S = RESULT >> 7;
+    Z->FLAGS.FLAG_P = BC != 0;
+
+    Z->FLAGS.FLAG_B3 = IS_BIT_SET(B35_PAIR, 3);
+    Z->FLAGS.FLAG_B5 = IS_BIT_SET(B35_PAIR, 5);
+
+    Z80_SET_PAIR(Z, Z80_B, Z80_C, VALUE);
+    Z80_SET_PAIR(Z, Z80_H, Z80_L, VALUE);
 }
 
 // A PROFICIENT WAY OF BEING ABLE TO ACCES THE OPCODE MASK TTPES
