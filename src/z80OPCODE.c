@@ -238,7 +238,19 @@ Z80_MAKE_OPCODE(CPI_CPD)
 
 Z80_MAKE_OPCODE(CPI)
 {
-    CPI_CPD(Z, +1);
+    VALUE += 1;
+    CPI_CPD(Z, +VALUE);
+}
+
+Z80_MAKE_OPCODE(CPI_R)
+{
+    CPI(Z, VALUE);
+
+    if(Z80_GET_PAIR(Z, Z80_B, Z80_C) != 0 && Z->FLAGS.FLAG_Z == 0)
+    {
+        Z->PC += 2;
+        Z->CYCLES += 5;
+    }
 }
 
 // A PROFICIENT WAY OF BEING ABLE TO ACCES THE OPCODE MASK TTPES
