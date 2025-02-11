@@ -270,6 +270,42 @@ Z80_MAKE_OPCODE(CPDR)
     }
 }
 
+Z80_MAKE_OPCODE(DAA)
+{
+    unsigned Z80_A_BUFFER = 0;
+
+    if(Z->FLAGS.FLAG_N && Z->FLAGS.FLAG_C)
+    {
+        Z80_A_BUFFER = Z80_GET_REGISTERS(Z, Z80_A);
+        Z80_A_BUFFER -= 0x60;
+
+        Z->FLAGS.FLAG_C = 1;
+
+        if(Z->FLAGS.FLAG_H) { Z80_A_BUFFER -= 0x6; }
+    }
+
+    else
+    {
+        if(Z->FLAGS.FLAG_C || Z80_A_BUFFER > 0x90)
+        {
+            Z80_A_BUFFER += 0x60;
+            Z->FLAGS.FLAG_C = 1;
+        }
+
+        if(Z->FLAGS.FLAG_H || (Z80_A_BUFFER & 0x0F) > 0x09)
+        {
+            Z80_A_BUFFER += 0x6;
+        }
+    }
+
+    Z->FLAGS.FLAG_P = PARTIY(Z80_A);
+    Z->FLAGS.FLAG_Z = Z80_A == 0;
+    Z->FLAGS.FLAG_S = Z80_A >> 7;
+    Z->FLAGS.FLAG_H == ((Z80_A & 0x0F) + (VALUE & 0x0F)) > 0x0F;
+    Z->FLAGS.FLAG_B3 = IS_BIT_SET(Z80_A, 3);
+    Z->FLAGS.FLAG_B5 = IS_BIT_SET(Z80_A, 5);
+}
+
 Z80_MAKE_OPCODE(DI)
 {
     VALUE = 0;
