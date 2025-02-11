@@ -338,9 +338,19 @@ Z80_MAKE_OPCODE(DJNZ)
     else { Z->PC += 1; }
 }
 
+Z80_MAKE_OPCODE(EI)
+{
+    Z->EI_DELAY = 1;
+}
+
 Z80_MAKE_OPCODE(JR)
 {
     Z->PC += ((S8)Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE) + 1);
+}
+
+Z80_MAKE_OPCODE(HALT)
+{
+    Z->HALT = 1;
 }
 
 // A PROFICIENT WAY OF BEING ABLE TO ACCES THE OPCODE MASK TTPES
