@@ -461,8 +461,60 @@ Z80_MAKE_OPCODE(LDI_LDD)
 }
 
 Z80_MAKE_OPCODE(LDI)
-{
+{  
+    VALUE += 1;
+    LDI_LDD(Z, VALUE);
+}
 
+Z80_MAKE_OPCODE(LDIR)
+{
+    LDI(Z, VALUE);
+
+    if(Z80_GET_PAIR(Z, Z80_B, Z80_C) != 0)
+    {
+        Z->PC -= 2;
+        Z->CYCLES += 5;
+    }
+}
+
+Z80_MAKE_OPCODE(LDD)
+{
+    VALUE = -1;
+    LDI_LDD(Z, VALUE);
+}
+
+Z80_MAKE_OPCODE(LDDR)
+{
+    LDD(Z, VALUE);
+
+    if(Z80_GET_PAIR(Z, Z80_B, Z80_C) != 0)
+    {
+        Z->PC -= 2;
+        Z->CYCLES += 5;
+    }
+}
+
+Z80_MAKE_OPCODE(NEG)
+{
+    SUB(Z, Z80_A * 2);
+}
+
+Z80_MAKE_OPCODE(SUB)
+{
+    U8 RESULT = Z80_A - VALUE;
+
+    Z->FLAGS.FLAG_C = VALUE > Z80_A;
+    Z->FLAGS.FLAG_N = 1;
+    Z->FLAGS.FLAG_P = CALC_VFLAG_8(Z80_A, ~VALUE + 1, RESULT);
+    Z->FLAGS.FLAG_H = (Z80_A & 0xF) < (VALUE & 0xF);
+
+    Z->FLAGS.FLAG_B3 = IS_BIT_SET(RESULT, 3);
+    Z->FLAGS.FLAG_B5 = IS_BIT_SET(RESULT, 5);
+
+    Z->FLAGS.FLAG_Z = RESULT == 0;
+    Z->FLAGS.FLAG_S = RESULT >> 7;
+
+    VALUE = Z80_A;
 }
 
 // A PROFICIENT WAY OF BEING ABLE TO ACCES THE OPCODE MASK TTPES
