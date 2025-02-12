@@ -534,6 +534,54 @@ Z80_MAKE_OPCODE(OR)
     RESULT = Z80_A;
 }
 
+Z80_MAKE_OPCODE(OUTI_OUTD)
+{
+    int INCREMENT = 0;
+    U16 HL = Z80_GET_PAIR(Z, Z80_H, Z80_L);
+    VALUE = Z->Z80_MEM->READ_8((void*)(unsigned)HL, 0);
+
+    HL += INCREMENT;
+    Z->FLAGS.FLAG_Z = Z80_B == 0;
+    Z->FLAGS.FLAG_N = 1;
+
+    Z80_SET_PAIR(Z, Z80_H, Z80_L, VALUE);
+}
+
+Z80_MAKE_OPCODE(OUTD)
+{
+    VALUE = -1;
+    OUTI_OUTD(Z, VALUE);
+}
+
+Z80_MAKE_OPCODE(OUTI)
+{
+    VALUE = 1;
+    OUTI_OUTD(Z, VALUE);
+}
+
+Z80_MAKE_OPCODE(OTIR)
+{
+    VALUE = 1;
+    OUTI(Z, VALUE);
+
+    if(Z80_B != 0)
+    {
+        Z->PC -= 2;
+        Z->CYCLES += 5;
+    }
+}
+
+Z80_MAKE_OPCODE(OTDR)
+{
+    OUTD(Z, VALUE);
+
+    if(Z80_B != 0)
+    {
+        Z->PC -= 2;
+        Z->CYCLES += 5;
+    }
+}
+
 // A PROFICIENT WAY OF BEING ABLE TO ACCES THE OPCODE MASK TTPES
 // BASED ON THE MAJORITY OF INSTRUCTIONS, IMM LOADS AND NOP/ILLEGAL
 
