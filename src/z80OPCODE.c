@@ -392,6 +392,79 @@ Z80_MAKE_OPCODE(INI_IND)
     Z80_SET_PAIR(Z, Z80_H, Z80_L, VALUE);
 }
 
+Z80_MAKE_OPCODE(IND)
+{
+    VALUE = -1;
+    INI_IND(Z, VALUE);
+}
+
+Z80_MAKE_OPCODE(INDR)
+{
+    IND(Z, VALUE);
+
+    if(Z80_B != 0)
+    {
+        Z->PC -= 2;
+        Z->CYCLES += 5;
+    }
+}
+
+Z80_MAKE_OPCODE(INI)
+{
+    VALUE += 1;
+    INI_IND(Z, VALUE);
+}
+
+Z80_MAKE_OPCODE(INIR)
+{
+    INI(Z, VALUE);
+
+    if(Z80_B != 0)
+    {
+        Z->PC -= 2;
+        Z->CYCLES += 5;
+    }
+}
+
+Z80_MAKE_OPCODE(JP)
+{
+    int COND = 0;
+    Z->PC = Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE);
+
+    if(COND) { JP(Z, VALUE); }
+    else { Z->PC += 2; }
+}
+
+Z80_MAKE_OPCODE(LDI_LDD)
+{
+    int INCREMENT = 0;
+    U16 HL = Z80_GET_PAIR(Z, Z80_H, Z80_L);
+    U16 DE = Z80_GEN_PAIR(Z, Z80_D, Z80_E);
+    U16 BC = Z80_GET_PAIR(Z, Z80_B, Z80_C);
+
+    VALUE = Z->Z80_MEM->READ_8((void*)(unsigned)HL, 0);
+    Z->Z80_MEM->WRITE_8((void*)(unsigned)DE, VALUE, 0);
+
+    HL += INCREMENT;
+    DE += INCREMENT;
+    BC--;
+
+    Z->FLAGS.FLAG_H = 0;
+    Z->FLAGS.FLAG_P = BC != 0;
+    Z->FLAGS.FLAG_N = 0;
+    Z->FLAGS.FLAG_B3 = IS_BIT_SET(Z80_A + VALUE, 3);
+    Z->FLAGS.FLAG_B5 = IS_BIT_SET(Z80_A + VALUE, 5);
+
+    Z80_SET_PAIR(Z, Z80_B, Z80_C, VALUE);
+    Z80_SET_PAIR(Z, Z80_D, Z80_E, VALUE);
+    Z80_SET_PAIR(Z, Z80_H, Z80_L, VALUE);
+}
+
+Z80_MAKE_OPCODE(LDI)
+{
+
+}
+
 // A PROFICIENT WAY OF BEING ABLE TO ACCES THE OPCODE MASK TTPES
 // BASED ON THE MAJORITY OF INSTRUCTIONS, IMM LOADS AND NOP/ILLEGAL
 
