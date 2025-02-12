@@ -582,6 +582,68 @@ Z80_MAKE_OPCODE(OTDR)
     }
 }
 
+Z80_MAKE_OPCODE(OUT)
+{
+    Z->Z80_MEM->WRITE_16((void*)(unsigned)Z, Z80_C, VALUE);
+}
+
+Z80_MAKE_OPCODE_8(RES)
+{
+    Z80_UNUSED(Z);
+
+    U8 const VALUE = 0;
+    U8 const BIT = 0;
+    U8 RESULT = VALUE & ~BIT;
+
+    return RESULT;
+}
+
+Z80_MAKE_OPCODE(RET)
+{
+    Z80_UNUSED(VALUE);
+    Z->PC = POP(Z);
+}
+
+Z80_MAKE_OPCODE(RET_CC)
+{
+    int CONDITION = 0;
+
+    if(CONDITION)
+    {
+        RET(Z, VALUE);
+        Z->CYCLES += 6;
+    }
+}
+
+Z80_MAKE_OPCODE(RETI)
+{
+    Z80_UNUSED(VALUE);
+    Z->PC = POP(Z);
+}
+
+Z80_MAKE_OPCODE(RETN)
+{
+    Z80_UNUSED(VALUE);
+    Z->PC = POP(Z);
+}
+
+Z80_MAKE_OPCODE_8(RL)
+{
+    U8 VALUE = 0;
+    U8 RESULT = (VALUE << 1);
+
+    Z->FLAGS.FLAG_C = VALUE >> 7;
+    Z->FLAGS.FLAG_N = 0;
+    Z->FLAGS.FLAG_P = PARTIY(RESULT);
+    Z->FLAGS.FLAG_H = 0;
+    Z->FLAGS.FLAG_B3 = IS_BIT_SET(RESULT, 3);
+    Z->FLAGS.FLAG_B5 = IS_BIT_SET(RESULT, 5);
+    Z->FLAGS.FLAG_Z = RESULT == 0;
+    Z->FLAGS.FLAG_S = RESULT >> 7;
+
+    return RESULT;  
+}
+
 // A PROFICIENT WAY OF BEING ABLE TO ACCES THE OPCODE MASK TTPES
 // BASED ON THE MAJORITY OF INSTRUCTIONS, IMM LOADS AND NOP/ILLEGAL
 
