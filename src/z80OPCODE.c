@@ -40,6 +40,11 @@ Z80_MAKE_OPCODE_16(POP)
     return RESULT;
 }
 
+Z80_MAKE_OPCODE(JR)
+{
+    Z->PC += ((S8)Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE) + 1);
+}
+
 Z80_MAKE_OPCODE_8(NEXTB)
 {
     return Z80_READ_BYTE(Z->Z80_MEM, Z->PC++);
@@ -340,17 +345,51 @@ Z80_MAKE_OPCODE(DJNZ)
 
 Z80_MAKE_OPCODE(EI)
 {
-    Z->EI_DELAY = 1;
-}
-
-Z80_MAKE_OPCODE(JR)
-{
-    Z->PC += ((S8)Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE) + 1);
+   VALUE = 1;
+   Z->EI_DELAY = VALUE;
 }
 
 Z80_MAKE_OPCODE(HALT)
+{ 
+    VALUE = 1;
+    Z->HALT = VALUE;
+}
+
+Z80_MAKE_OPCODE_8(IN)
 {
-    Z->HALT = 1;
+    U8 RESULT = Z->Z80_MEM->READ_8((void*)(unsigned)Z80_C, 0);
+
+    Z->FLAGS.FLAG_N = 0;
+    Z->FLAGS.FLAG_P = PARTIY(RESULT);
+    Z->FLAGS.FLAG_H = 0;
+
+    return RESULT;
+}
+
+Z80_MAKE_OPCODE_8(INC)
+{
+    U8 VALUE = 0;
+    U8 RESULT = VALUE + 1;
+    Z->FLAGS.FLAG_N = 0;
+
+    return RESULT;
+}
+
+Z80_MAKE_OPCODE(INI_IND)
+{
+    unsigned INCREMENT = 0;
+    U16 HL = Z80_GET_PAIR(Z, Z80_H, Z80_L);
+    VALUE = Z80_READ_BYTE(Z->Z80_MEM, Z80_C);
+
+    Z80_WRITE_BYTE(Z->Z80_MEM, 0, VALUE);
+
+    HL += INCREMENT;
+    Z80_GET_REGISTERS(Z, Z80_B);
+
+    Z->FLAGS.FLAG_Z = Z80_B == 0;
+    Z->FLAGS.FLAG_N = 1;
+
+    Z80_SET_PAIR(Z, Z80_H, Z80_L, VALUE);
 }
 
 // A PROFICIENT WAY OF BEING ABLE TO ACCES THE OPCODE MASK TTPES
