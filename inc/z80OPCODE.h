@@ -65,17 +65,5 @@
 
     U8 Z80_GET_OPCODE_CYCLES(U8);
 
-    extern U8 PARTIY(U8 VALUE)
-    {   
-        U8 BIT_SHIFT = 0;
-
-        for(int INDEX = 0; INDEX < 8; INDEX++)
-        {
-            BIT_SHIFT += ((VALUE >> INDEX) & 1);
-        }
-
-        return BIT_SHIFT;
-    }
-
 #endif
 #endif
