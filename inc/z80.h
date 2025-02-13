@@ -131,19 +131,10 @@
 /*-------------------------------------------------------------------------------*/
 /*===============================================================================*/
 
-typedef struct Z80_MEMORY
-{
-    U8 (*READ_8)(void* USER_DATA, U16 ADDR);
-    U16 (*READ_16)(void* USER_DATA, U16 ADDR);
-    void (*WRITE_8)(void* USER_DATA, U16 ADDR, U8 VAL);
-    void (*WRITE_16)(void* USER_DATA, U16 ADDR, U16 VAL);
-    void* USER_DATA;
-
-} Z80_MEMORY;
-
 typedef struct CPU_Z80
 {
-    struct Z80_MEMORY Z80_MEM;
+    const U8* READ_MAPPER[0x10000 / 0x400];
+    U8* WRITE_MAPPER[0x10000 / 0x400];
 
     U16 CYCLES;
     U16 PC;
@@ -158,6 +149,9 @@ typedef struct CPU_Z80
     unsigned INT_PENDING : 1;
     unsigned NMI_PENDING : 1;
     unsigned EI_DELAY : 1;
+
+    unsigned IFF1;
+    unsigned IFF2;
 
     U16 REGISTER_BASE[16];
 
@@ -187,12 +181,17 @@ void Z80_INIT(CPU_Z80* const Z80);
 void Z80_RUN(CPU_Z80* const Z80);
 void Z80_OUTPUT(CPU_Z80* const Z80);
 
-void Z80_EXEC(CPU_Z80* CPU, int CYCLES);
+void Z80_EXEC(CPU_Z80* CPU);
 
 unsigned Z80_GET_REGISTERS(CPU_Z80* const Z80, int REGISTER);
 void Z80_SET_REGISTERS(CPU_Z80* const Z80, int REGISTER, U8 VALUE);
 void Z80_STEP(CPU_Z80* const Z80);
 void Z80_GEN_NMI(CPU_Z80* const Z80);
 void Z80_GEN_INT_DATA(CPU_Z80* const Z80);
+
+U8 READ_8(CPU_Z80* Z, U16 ADDR);
+U16 READ_16(CPU_Z80* Z, U16 ADDR);
+void WRITE_8(CPU_Z80* Z, U16 ADDR, U8 VALUE);
+void WRITE_16(CPU_Z80* Z, U16 ADDR, U8 VALUE);
 
 #endif
