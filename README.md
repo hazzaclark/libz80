@@ -1,6 +1,8 @@
 # libz80
 Zilog Z80 Standalone Emulation Library
 
+![image](https://github.com/user-attachments/assets/eb31a63c-af45-4b43-811f-9f70a1a79567)
+
 # Motive:
 
 The motive behind this repository is to provide a surrogate means of aiding in relevant Zilog Z80 developments.
