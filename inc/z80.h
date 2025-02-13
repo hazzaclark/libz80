@@ -17,6 +17,7 @@
 
 /* SYSTEM INCLUDES */
 
+#include <assert.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -193,5 +194,7 @@ U8 READ_8(CPU_Z80* Z, U16 ADDR);
 U16 READ_16(CPU_Z80* Z, U16 ADDR);
 void WRITE_8(CPU_Z80* Z, U16 ADDR, U8 VALUE);
 void WRITE_16(CPU_Z80* Z, U16 ADDR, U8 VALUE);
+
+U8 PARITY(U8 VALUE);
 
 #endif
