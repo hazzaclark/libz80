@@ -7,7 +7,6 @@
 // NESTED INCLUDES
 
 #include "z80.h"
-#include "z80CONF.h"
 #include "z80OPCODE.h"
 
 // HELPER FUNCTION FOR BEING ABLE TO GET THE REGISTERS
@@ -81,11 +80,6 @@ void Z80_INIT(CPU_Z80* const Z80)
     Z80->MEMORY_REFRESH = 0;
     Z80->CYCLES = 0;
 
-    Z80->Z80_MEM.READ_8 = (U8 (*)(void*, U16)) Z80_READ_BYTE;
-    Z80->Z80_MEM.READ_16 = (U16 (*)(void*, U16)) Z80_READ_WORD;
-    Z80->Z80_MEM.WRITE_8 = (void (*)(void*, U16, U8)) Z80_WRITE_BYTE;
-    Z80->Z80_MEM.WRITE_16 = (void (*)(void*, U16, U16)) Z80_WRITE_WORD;
-
 }
 
 // GET THE DEBUG OUTPUT FOR THE EMULATOR TO BE ABLE TO KEEP A TRACK OF TRACES
@@ -106,4 +100,45 @@ void Z80_OUTPUT(CPU_Z80* const Z80)
            Z80_GET_REGISTERS(Z80, Z80_I),
            Z80_GET_REGISTERS(Z80, Z80_R)
     );
+}
+
+/*===============================================================================*/
+/*-------------------------------------------------------------------------------*/
+//                        Z80 READ AND WRITE FUNCTIONS
+/*-------------------------------------------------------------------------------*/
+/*===============================================================================*/
+
+// VERY SIMPLE READ AND WRITE SCHEMA FOR THE 16-BIT WIDE BUS THAT THE Z80 OFFERS
+// THE IDEA IS THAT THE READER AND WRITER WILL EVALUATE THE SPACE DESIGNATED FOR THE BUS
+
+// AND BIT SHIFT ACCORDINGLY TO THE MAX FLAG VALUE POSSIBLE
+
+// IN THE CASE OF THE 16 BIT READ AND WRITE VALUES, WE WILL LOOK TO DETERMINE
+// THE HI AND LO VALUES DESIGNATED FOR THE HI AND LO REGISTERS RESPECTIVELY
+// AND JUST ADD THE REMAINING BIT MANTISSA TO IT
+
+U8 READ_8(CPU_Z80* Z, U16 ADDR)
+{
+    assert(Z->READ_MAPPER[ADDR >> 10] && 0);
+    return Z->READ_MAPPER[ADDR >> 10][ADDR & 0x3FF];
+}
+
+void WRITE_8(CPU_Z80* Z, U16 ADDR, U8 VALUE)
+{
+    assert(Z->READ_MAPPER[ADDR >> 10] && 0);
+    Z->READ_MAPPER[ADDR >> 10][ADDR & 0x3FF];
+}
+
+U8 READ_16(CPU_Z80* Z, U16 ADDR)
+{
+    U16 const LO = READ_8(Z, ADDR + 0); 
+    U16 const HI = READ_8(Z, ADDR + 1);
+
+    return (HI << 8) | LO;
+}
+
+void WRITE_16(CPU_Z80* Z, U16 ADDR, U8 VALUE)
+{
+    WRITE_8(Z, ADDR + 0, VALUE & 0xFF);
+    WRITE_8(Z, ADDR + 1, VALUE >> 8);
 }
