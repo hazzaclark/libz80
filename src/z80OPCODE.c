@@ -5,13 +5,13 @@
 
 // NESTED INCLUDES
 
-
 #include "z80OPCODE.h"
 
 #ifdef BUILD_OP_TABLE
 
 #define         Z80_OPCODE_MASK     0xC0
 #define         Z80_OPCODE_PATTERN  0x40
+
 
 // THE FOLLOWING IMPLEMENTS A SIMILAR, IF NOT, THE EXACT SAME SCHEMA DEFINED IN LIB68K
 // WHEREBY, A MACRO ENCOMPASSES THE CREATION OF OPCODES ACROSS ALL FILES
@@ -28,13 +28,13 @@
 
 Z80_MAKE_OPCODE(PUSH)
 {
-    Z->SP -= 2;
-    Z80_WRITE_WORD(Z->SP, VALUE);
+    WRITE_8(Z, Z->SP, VALUE >> 8 & 0xFF);
+    WRITE_8(Z, Z->SP, VALUE & 0xFF);
 }
 
 Z80_MAKE_OPCODE_16(POP)
 {
-    const U16 RESULT = Z80_READ_WORD(Z->SP - 2);
+    const U16 RESULT = READ_16(Z, Z->SP);
     Z->SP += 2;
 
     return RESULT;
@@ -42,17 +42,17 @@ Z80_MAKE_OPCODE_16(POP)
 
 Z80_MAKE_OPCODE(JR)
 {
-    Z->PC += READ_8(Z->PC, VALUE + 1);
+    Z->PC = READ_8(Z, VALUE);
 }
 
 Z80_MAKE_OPCODE_8(NEXTB)
 {
-    return Z80_READ_BYTE(Z->PC++);
+    return READ_8(Z, Z->PC++);
 }
 
 Z80_MAKE_OPCODE_16(NEXTW)
 {
-    return Z80_READ_WORD(Z->PC - 2);
+    return READ_16(Z, Z->PC);
 }
 
 Z80_MAKE_OPCODE(ADD)
@@ -88,7 +88,7 @@ Z80_MAKE_OPCODE(ADD_R)
 
 Z80_MAKE_OPCODE(ADD_IMM)
 {
-    ADD(Z, Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE));
+    ADD(Z, READ_8(Z->PC, VALUE));
 }
 
 Z80_MAKE_OPCODE(AND)
@@ -109,12 +109,12 @@ Z80_MAKE_OPCODE(AND)
 
 Z80_MAKE_OPCODE(AND_IMM)
 {
-    AND(Z, Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE));
+    AND(Z, READ_8(Z->PC, VALUE));
 }
 
 Z80_MAKE_OPCODE(AND_R)
 {
-    AND(Z, Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE));
+    AND(Z, READ_8(Z->PC, VALUE));
 }
 
 Z80_MAKE_OPCODE(ADC)
@@ -124,7 +124,7 @@ Z80_MAKE_OPCODE(ADC)
 
 Z80_MAKE_OPCODE(ADC_R)
 {
-    ADC(Z, Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE));
+    ADC(Z, READ_8(Z->PC, VALUE));
 }
 
 Z80_MAKE_OPCODE(ADC_HL)
@@ -148,7 +148,7 @@ Z80_MAKE_OPCODE(ADC_HL)
 
 Z80_MAKE_OPCODE(ADC_IMM)
 {
-    ADC(Z, Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE));
+    ADC(Z, READ_8(Z->PC, VALUE));
     Z->PC++;
 }
 
@@ -206,13 +206,13 @@ Z80_MAKE_OPCODE(CP)
 
 Z80_MAKE_OPCODE(CP_IMM)
 {
-    U8 BYTE = Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE);
+    U8 BYTE = READ_8(Z->PC, VALUE);
     CP(Z, BYTE);
 }
 
 Z80_MAKE_OPCODE(CP_R)
 {
-    CP(Z, Z->Z80_MEM.READ_8(Z, VALUE));   
+    CP(Z, READ_8(Z, VALUE));   
 }
 
 Z80_MAKE_OPCODE(CPI_CPD)
@@ -221,7 +221,7 @@ Z80_MAKE_OPCODE(CPI_CPD)
     U16 HL = Z80_GET_PAIR(Z, Z80_H, Z80_L);
     U16 BC = Z80_GET_PAIR(Z, Z80_B, Z80_C);
 
-    U8 READ_VALUE = Z->Z80_MEM.READ_8((void*)(unsigned)HL, VALUE);
+    U8 READ_VALUE = READ_8(HL, VALUE);
     U8 RESULT = Z80_A - READ_VALUE;
     U8 B35_PAIR = Z80_A - VALUE - Z->FLAGS.FLAG_H;
 
@@ -357,7 +357,7 @@ Z80_MAKE_OPCODE(HALT)
 
 Z80_MAKE_OPCODE_8(IN)
 {
-    U8 RESULT = Z->Z80_MEM.READ_8((void*)(unsigned)Z80_C, 0);
+    U8 RESULT = READ_8(Z80_C, 0);
 
     Z->FLAGS.FLAG_N = 0;
     Z->FLAGS.FLAG_P = PARITY(RESULT);
@@ -379,9 +379,9 @@ Z80_MAKE_OPCODE(INI_IND)
 {
     unsigned INCREMENT = 0;
     U16 HL = Z80_GET_PAIR(Z, Z80_H, Z80_L);
-    VALUE = Z80_READ_BYTE(Z80_C);
+    VALUE = READ_8(Z, Z80_C);
 
-    Z80_WRITE_BYTE(VALUE, 0);
+    WRITE_8(Z, 0, VALUE);
 
     HL += INCREMENT;
     Z80_GET_REGISTERS(Z, Z80_B);
@@ -429,7 +429,7 @@ Z80_MAKE_OPCODE(INIR)
 Z80_MAKE_OPCODE(JP)
 {
     int COND = 0;
-    Z->PC = Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE);
+    Z->PC = READ_8(Z->PC, VALUE);
 
     if(COND) { JP(Z, VALUE); }
     else { Z->PC += 2; }
@@ -442,8 +442,8 @@ Z80_MAKE_OPCODE(LDI_LDD)
     U16 DE = Z80_GET_PAIR(Z, Z80_D, Z80_E);
     U16 BC = Z80_GET_PAIR(Z, Z80_B, Z80_C);
 
-    VALUE = Z->Z80_MEM.READ_8((void*)(unsigned)HL, 0);
-    Z->Z80_MEM.WRITE_8((void*)(unsigned)DE, VALUE, 0);
+    VALUE = READ_8(HL, 0);
+    WRITE_8(DE, VALUE, 0);
 
     HL += INCREMENT;
     DE += INCREMENT;
@@ -538,7 +538,7 @@ Z80_MAKE_OPCODE(OUTI_OUTD)
 {
     int INCREMENT = 0;
     U16 HL = Z80_GET_PAIR(Z, Z80_H, Z80_L);
-    VALUE = Z->Z80_MEM.READ_8((void*)(unsigned)HL, 0);
+    VALUE = READ_8(HL, 0);
 
     HL += INCREMENT;
     Z->FLAGS.FLAG_Z = Z80_B == 0;
@@ -584,7 +584,7 @@ Z80_MAKE_OPCODE(OTDR)
 
 Z80_MAKE_OPCODE(OUT)
 {
-    Z->Z80_MEM.WRITE_16((void*)(unsigned)Z, Z80_C, VALUE);
+    WRITE_16(Z, Z80_C, VALUE);
 }
 
 Z80_MAKE_OPCODE_8(RES)
