@@ -6,6 +6,9 @@
 // NESTED INCLUDES
 
 #include "common.h"
+#include "z80.h"
+#include "z80OPCODE.h"
+#include "z80CONF.h"
 
 // SYSTEM INCLUDES
 
@@ -14,6 +17,9 @@
 
 int main(void)
 {
-    printf("");
+    printf("====================================================\n");
+    printf("        HARRY CLARK - ZILOG Z80 EMULATOR            \n");
+    printf("====================================================\n");
+
     return 0;
 }
