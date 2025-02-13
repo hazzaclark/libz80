@@ -6,12 +6,12 @@
 // NESTED INCLUDES
 
 #include "z80OPCODE.h"
+#include "z80CONF.h"
 
 #ifdef BUILD_OP_TABLE
 
 #define         Z80_OPCODE_MASK     0xC0
 #define         Z80_OPCODE_PATTERN  0x40
-
 
 // THE FOLLOWING IMPLEMENTS A SIMILAR, IF NOT, THE EXACT SAME SCHEMA DEFINED IN LIB68K
 // WHEREBY, A MACRO ENCOMPASSES THE CREATION OF OPCODES ACROSS ALL FILES
@@ -29,12 +29,12 @@
 Z80_MAKE_OPCODE(PUSH)
 {
     Z->SP -= 2;
-    Z80_WRITE_WORD(Z->Z80_MEM, Z->SP, VALUE);
+    Z80_WRITE_WORD(Z->SP, VALUE);
 }
 
 Z80_MAKE_OPCODE_16(POP)
 {
-    const U16 RESULT = Z80_READ_WORD(Z->Z80_MEM, Z->SP - 2);
+    const U16 RESULT = Z80_READ_WORD(Z->SP - 2);
     Z->SP += 2;
 
     return RESULT;
@@ -42,17 +42,17 @@ Z80_MAKE_OPCODE_16(POP)
 
 Z80_MAKE_OPCODE(JR)
 {
-    Z->PC += ((S8)Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE) + 1);
+    Z->PC += ((S8)Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE) + 1);
 }
 
 Z80_MAKE_OPCODE_8(NEXTB)
 {
-    return Z80_READ_BYTE(Z->Z80_MEM, Z->PC++);
+    return Z80_READ_BYTE(Z->PC++);
 }
 
 Z80_MAKE_OPCODE_16(NEXTW)
 {
-    return Z80_READ_WORD(Z->Z80_MEM, Z->PC - 2);
+    return Z80_READ_WORD(Z->PC - 2);
 }
 
 Z80_MAKE_OPCODE(ADD)
@@ -88,7 +88,7 @@ Z80_MAKE_OPCODE(ADD_R)
 
 Z80_MAKE_OPCODE(ADD_IMM)
 {
-    ADD(Z, Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE));
+    ADD(Z, Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE));
 }
 
 Z80_MAKE_OPCODE(AND)
@@ -109,12 +109,12 @@ Z80_MAKE_OPCODE(AND)
 
 Z80_MAKE_OPCODE(AND_IMM)
 {
-    AND(Z, Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE));
+    AND(Z, Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE));
 }
 
 Z80_MAKE_OPCODE(AND_R)
 {
-    AND(Z, Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE));
+    AND(Z, Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE));
 }
 
 Z80_MAKE_OPCODE(ADC)
@@ -124,7 +124,7 @@ Z80_MAKE_OPCODE(ADC)
 
 Z80_MAKE_OPCODE(ADC_R)
 {
-    ADC(Z, Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE));
+    ADC(Z, Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE));
 }
 
 Z80_MAKE_OPCODE(ADC_HL)
@@ -148,7 +148,7 @@ Z80_MAKE_OPCODE(ADC_HL)
 
 Z80_MAKE_OPCODE(ADC_IMM)
 {
-    ADC(Z, Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE));
+    ADC(Z, Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE));
     Z->PC++;
 }
 
@@ -168,7 +168,7 @@ Z80_MAKE_OPCODE(BIT)
 
 Z80_MAKE_OPCODE(CALL)
 { 
-    U16 READ_VALUE = Z80_READ_WORD(Z->Z80_MEM, VALUE);
+    U16 READ_VALUE = Z80_READ_WORD(VALUE);
     PUSH(Z, Z->PC + 2);
 
     Z->PC = READ_VALUE;
@@ -206,13 +206,13 @@ Z80_MAKE_OPCODE(CP)
 
 Z80_MAKE_OPCODE(CP_IMM)
 {
-    U8 BYTE = Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE);
+    U8 BYTE = Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE);
     CP(Z, BYTE);
 }
 
 Z80_MAKE_OPCODE(CP_R)
 {
-    CP(Z, Z->Z80_MEM->READ_8(Z, VALUE));   
+    CP(Z, Z->Z80_MEM.READ_8(Z, VALUE));   
 }
 
 Z80_MAKE_OPCODE(CPI_CPD)
@@ -221,7 +221,7 @@ Z80_MAKE_OPCODE(CPI_CPD)
     U16 HL = Z80_GET_PAIR(Z, Z80_H, Z80_L);
     U16 BC = Z80_GET_PAIR(Z, Z80_B, Z80_C);
 
-    U8 READ_VALUE = Z->Z80_MEM->READ_8((void*)(unsigned)HL, VALUE);
+    U8 READ_VALUE = Z->Z80_MEM.READ_8((void*)(unsigned)HL, VALUE);
     U8 RESULT = Z80_A - READ_VALUE;
     U8 B35_PAIR = Z80_A - VALUE - Z->FLAGS.FLAG_H;
 
@@ -357,7 +357,7 @@ Z80_MAKE_OPCODE(HALT)
 
 Z80_MAKE_OPCODE_8(IN)
 {
-    U8 RESULT = Z->Z80_MEM->READ_8((void*)(unsigned)Z80_C, 0);
+    U8 RESULT = Z->Z80_MEM.READ_8((void*)(unsigned)Z80_C, 0);
 
     Z->FLAGS.FLAG_N = 0;
     Z->FLAGS.FLAG_P = PARTIY(RESULT);
@@ -379,9 +379,9 @@ Z80_MAKE_OPCODE(INI_IND)
 {
     unsigned INCREMENT = 0;
     U16 HL = Z80_GET_PAIR(Z, Z80_H, Z80_L);
-    VALUE = Z80_READ_BYTE(Z->Z80_MEM, Z80_C);
+    VALUE = Z80_READ_BYTE(Z80_C);
 
-    Z80_WRITE_BYTE(Z->Z80_MEM, 0, VALUE);
+    Z80_WRITE_BYTE(VALUE, 0);
 
     HL += INCREMENT;
     Z80_GET_REGISTERS(Z, Z80_B);
@@ -429,7 +429,7 @@ Z80_MAKE_OPCODE(INIR)
 Z80_MAKE_OPCODE(JP)
 {
     int COND = 0;
-    Z->PC = Z->Z80_MEM->READ_8((void*)(unsigned)Z->PC, VALUE);
+    Z->PC = Z->Z80_MEM.READ_8((void*)(unsigned)Z->PC, VALUE);
 
     if(COND) { JP(Z, VALUE); }
     else { Z->PC += 2; }
@@ -442,8 +442,8 @@ Z80_MAKE_OPCODE(LDI_LDD)
     U16 DE = Z80_GET_PAIR(Z, Z80_D, Z80_E);
     U16 BC = Z80_GET_PAIR(Z, Z80_B, Z80_C);
 
-    VALUE = Z->Z80_MEM->READ_8((void*)(unsigned)HL, 0);
-    Z->Z80_MEM->WRITE_8((void*)(unsigned)DE, VALUE, 0);
+    VALUE = Z->Z80_MEM.READ_8((void*)(unsigned)HL, 0);
+    Z->Z80_MEM.WRITE_8((void*)(unsigned)DE, VALUE, 0);
 
     HL += INCREMENT;
     DE += INCREMENT;
@@ -538,7 +538,7 @@ Z80_MAKE_OPCODE(OUTI_OUTD)
 {
     int INCREMENT = 0;
     U16 HL = Z80_GET_PAIR(Z, Z80_H, Z80_L);
-    VALUE = Z->Z80_MEM->READ_8((void*)(unsigned)HL, 0);
+    VALUE = Z->Z80_MEM.READ_8((void*)(unsigned)HL, 0);
 
     HL += INCREMENT;
     Z->FLAGS.FLAG_Z = Z80_B == 0;
@@ -584,7 +584,7 @@ Z80_MAKE_OPCODE(OTDR)
 
 Z80_MAKE_OPCODE(OUT)
 {
-    Z->Z80_MEM->WRITE_16((void*)(unsigned)Z, Z80_C, VALUE);
+    Z->Z80_MEM.WRITE_16((void*)(unsigned)Z, Z80_C, VALUE);
 }
 
 Z80_MAKE_OPCODE_8(RES)
@@ -735,52 +735,208 @@ U8 Z80_GET_OPCODE_CYCLES(U8 OPCODE)
 // EXECUTE THE FULL CPU SCHEMA BASED OFF OF ALL OF THE ABOVE DEFINITIONS
 // OPCODE DECLARATIONS, ETC
 
-void Z80_EXEC(CPU_Z80* const Z80, U8 OPCODE)
+void Z80_EXEC(CPU_Z80* const Z80)
 {
+    U8 OPCODE = 0;
     Z80->CYCLES += Z80_GET_OPCODE_CYCLES(OPCODE);
 
     // FOR EACH CONSECUTIVE CPU CYCLES, INCREMENT THE ALLOCATABLE
     // SPACE OF THE PC
 
-    OPCODE = Z80->Z80_MEM->READ_8((void*)(unsigned)Z80->PC++, 0);
+    OPCODE = Z80->Z80_MEM.READ_8((void*)(unsigned)Z80->PC++, 0);
 
     switch (OPCODE)
     {
-        case 0x00: break;
-
-        case 0x07: RLC(Z80); break;
-
-        case 0x27: DAA(Z80, 0); break;
-        case 0x37: SCF(Z80, 0); break;
-        case 0x3F: CCF(Z80, 0); break;
-
-        case 0x40: break; // NOP LD B,B
-        case 0x49: break; // NOP LD C,C
-        case 0x52: break; // NOP LD D,D
-        case 0x5B: break; // NOP LD E,E
-        case 0x64: break; // NOP LD H,H
-        case 0x6D: break; // NOP LD L,L
-        case 0x7F: break; // NOP LD A,A
-
-        case 0x76: HALT(Z80, 0); break;
-
-        case 0x10: DJNZ(Z80, 0); break;
-        case 0x18: JR(Z80, 0); break;
-        case 0xE9: Z80->PC = Z80_GET_PAIR(Z80, Z80_H, Z80_L); break;
-        case 0xC3: JP(Z80, 0); break;
-        case 0xC9: RET(Z80, 0); break;
-        case 0xCD: CALL(Z80, 0); break;
-
-        case 0xC5: PUSH(Z80, Z80_GET_PAIR(Z80, Z80_B, Z80_C)); break;
-        case 0xD5: PUSH(Z80, Z80_GET_PAIR(Z80, Z80_D, Z80_E)); break;
-        case 0xE5: PUSH(Z80, Z80_GET_PAIR(Z80, Z80_H, Z80_L)); break;
-
-        case 0xF3: DI(Z80, 0); break;
-        case 0xFB: EI(Z80, 0); break;
-
-        default:
+        case 0x40: 
+            Z80_SET_REGISTERS(Z80, Z80_B, Z80_GET_REGISTERS(Z80, Z80_B));
             break;
+
+        case 0x41: 
+            Z80_SET_REGISTERS(Z80, Z80_B, Z80_GET_REGISTERS(Z80, Z80_C));
+            break;
+
+        case 0x42: 
+            Z80_SET_REGISTERS(Z80, Z80_B, Z80_GET_REGISTERS(Z80, Z80_D));
+            break;
+
+        case 0x43: 
+            Z80_SET_REGISTERS(Z80, Z80_B, Z80_GET_REGISTERS(Z80, Z80_E));
+            break;
+
+        case 0x44: 
+            Z80_SET_REGISTERS(Z80, Z80_B, Z80_GET_REGISTERS(Z80, Z80_H));
+            break;
+
+        case 0x45: 
+            Z80_SET_REGISTERS(Z80, Z80_B, Z80_GET_REGISTERS(Z80, Z80_L));
+            break;
+
+        case 0x46: 
+            Z80_SET_REGISTERS(Z80, Z80_B, Z80_READ_BYTE(Z80_GET_PAIR(Z80, Z80_H, Z80_L)));
+            break;
+
+        case 0x47: 
+            Z80_SET_REGISTERS(Z80, Z80_B, Z80_GET_REGISTERS(Z80, Z80_A));
+            break;
+
+
+        case 0x01: 
+            Z80_SET_PAIR(Z80, Z80_B, Z80_C, Z80_READ_WORD(Z80->PC));
+            Z80->PC += 2;
+            break;
+
+        case 0x11: 
+            Z80_SET_PAIR(Z80, Z80_D, Z80_E, Z80_READ_WORD(Z80->PC));
+            Z80->PC += 2;
+            break;
+
+        case 0x21: 
+            Z80_SET_PAIR(Z80, Z80_H, Z80_L, Z80_READ_WORD(Z80->PC));
+            Z80->PC += 2;
+            break;
+
+        case 0x31: 
+            Z80->SP = Z80_READ_WORD(Z80->PC);
+            Z80->PC += 2;
+            break;
+
+        case 0x80: 
+            ADD(Z80, Z80_GET_REGISTERS(Z80, Z80_B));
+            break;
+
+        case 0x81: 
+            ADD(Z80, Z80_GET_REGISTERS(Z80, Z80_C));
+            break;
+
+        case 0x82:
+            ADD(Z80, Z80_GET_REGISTERS(Z80, Z80_D));
+            break;
+
+        case 0x83: 
+            ADD(Z80, Z80_GET_REGISTERS(Z80, Z80_E));
+            break;
+
+        case 0x84: 
+            ADD(Z80, Z80_GET_REGISTERS(Z80, Z80_H));
+            break;
+
+        case 0x85:
+            ADD(Z80, Z80_GET_REGISTERS(Z80, Z80_L));
+            break;
+
+        case 0x86: 
+            ADD(Z80, Z80_READ_BYTE((U16)Z80_GET_PAIR(Z80, Z80_H, Z80_L)));
+            break;
+
+        case 0x87: 
+            ADD(Z80, Z80_GET_REGISTERS(Z80, Z80_A));
+            break;
+
+        case 0xCB: 
+            {
+                U8 CB_OPCODE = Z80->Z80_MEM.READ_8((void*)(unsigned)Z80->PC++, 0);
+                switch (CB_OPCODE)
+                {
+                    case 0x00: 
+                        RLC(Z80);
+                        break;
+
+                    case 0x01: 
+                        RLC(Z80);
+                        break;
+                }
+            }
+            break;
+
+        case 0xC3:
+            Z80->PC = Z80_READ_WORD(Z80->PC);
+            break;
+
+        case 0xC2: 
+            if (!Z80->FLAGS.FLAG_Z) 
+            {
+                Z80->PC = Z80_READ_WORD(Z80->PC);
+            } 
+            else 
+            {
+                Z80->PC += 2;
+            }
+            break;
+
+        case 0xCA:
+            if (Z80->FLAGS.FLAG_Z) 
+            {
+                Z80->PC = Z80_READ_WORD(Z80->PC);
+            } 
+            else 
+            {
+                Z80->PC += 2;
+            }
+            break;
+
+        case 0x18: 
+            Z80->PC += (S8)Z80_READ_BYTE(Z80->PC) + 1;
+            break;
+
+        case 0x20: 
+            if (!Z80->FLAGS.FLAG_Z) 
+            {
+                Z80->PC += (S8)Z80_READ_BYTE(Z80->PC) + 1;
+            } 
+            else 
+            {
+                Z80->PC++;
+            }
+            break;
+
+        case 0x28: 
+            if (Z80->FLAGS.FLAG_Z) 
+            {
+                Z80->PC += (S8)Z80_READ_BYTE(Z80->PC) + 1;
+            } 
+            else 
+            {
+                Z80->PC++;
+            }
+            break;
+
+
+        case 0xC5: 
+            PUSH(Z80, Z80_GET_PAIR(Z80, Z80_B, Z80_C));
+            break;
+
+        case 0xD5:
+            PUSH(Z80, Z80_GET_PAIR(Z80, Z80_D, Z80_E));
+            break;
+
+        case 0xE5: 
+            PUSH(Z80, Z80_GET_PAIR(Z80, Z80_H, Z80_L));
+            break;
+
+        case 0xF1: 
+            Z80_SET_PAIR(Z80, Z80_A, Z80_F, POP(Z80));
+            break;
+
+        case 0x00: 
+            break;
+
+        case 0x76:
+            HALT(Z80, 0);
+            break;
+
+        case 0xF3: 
+            DI(Z80, 0);
+            break;
+
+        case 0xFB: 
+            EI(Z80, 0);
+            break;
+
+        default: break;
     }
+
+    Z80->REGISTER_BASE[Z80->MEMORY_REFRESH] = (Z80->REGISTER_BASE[Z80->MEMORY_REFRESH] + 1) & 0x7F;
+    Z80_OUTPUT(Z80);
 }
 
 #endif
