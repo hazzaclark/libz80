@@ -732,9 +732,55 @@ U8 Z80_GET_OPCODE_CYCLES(U8 OPCODE)
     }
 }
 
+// EXECUTE THE FULL CPU SCHEMA BASED OFF OF ALL OF THE ABOVE DEFINITIONS
+// OPCODE DECLARATIONS, ETC
+
 void Z80_EXEC(CPU_Z80* const Z80, U8 OPCODE)
 {
     Z80->CYCLES += Z80_GET_OPCODE_CYCLES(OPCODE);
+
+    // FOR EACH CONSECUTIVE CPU CYCLES, INCREMENT THE ALLOCATABLE
+    // SPACE OF THE PC
+
+    OPCODE = Z80->Z80_MEM->READ_8((void*)(unsigned)Z80->PC++, 0);
+
+    switch (OPCODE)
+    {
+        case 0x00: break;
+
+        case 0x07: RLC(Z80); break;
+
+        case 0x27: DAA(Z80, 0); break;
+        case 0x37: SCF(Z80, 0); break;
+        case 0x3F: CCF(Z80, 0); break;
+
+        case 0x40: break; // NOP LD B,B
+        case 0x49: break; // NOP LD C,C
+        case 0x52: break; // NOP LD D,D
+        case 0x5B: break; // NOP LD E,E
+        case 0x64: break; // NOP LD H,H
+        case 0x6D: break; // NOP LD L,L
+        case 0x7F: break; // NOP LD A,A
+
+        case 0x76: HALT(Z80, 0); break;
+
+        case 0x10: DJNZ(Z80, 0); break;
+        case 0x18: JR(Z80, 0); break;
+        case 0xE9: Z80->PC = Z80_GET_PAIR(Z80, Z80_H, Z80_L); break;
+        case 0xC3: JP(Z80, 0); break;
+        case 0xC9: RET(Z80, 0); break;
+        case 0xCD: CALL(Z80, 0); break;
+
+        case 0xC5: PUSH(Z80, Z80_GET_PAIR(Z80, Z80_B, Z80_C)); break;
+        case 0xD5: PUSH(Z80, Z80_GET_PAIR(Z80, Z80_D, Z80_E)); break;
+        case 0xE5: PUSH(Z80, Z80_GET_PAIR(Z80, Z80_H, Z80_L)); break;
+
+        case 0xF3: DI(Z80, 0); break;
+        case 0xFB: EI(Z80, 0); break;
+
+        default:
+            break;
+    }
 }
 
 #endif
