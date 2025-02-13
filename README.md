@@ -1,7 +1,8 @@
 # libz80
 Zilog Z80 Standalone Emulation Library
 
-![image](https://github.com/user-attachments/assets/eb31a63c-af45-4b43-811f-9f70a1a79567)
+![2025-02-13-195423_1365x652_scrot](https://github.com/user-attachments/assets/24d8a57b-1441-4ec3-8acd-c6b633ec4b4c)
+
 
 # Motive:
 
