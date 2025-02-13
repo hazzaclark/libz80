@@ -187,7 +187,7 @@ void Z80_INIT(CPU_Z80* const Z80);
 void Z80_RUN(CPU_Z80* const Z80);
 void Z80_OUTPUT(CPU_Z80* const Z80);
 
-void Z80_EXEC(CPU_Z80* cpu, int cycles);
+void Z80_EXEC(CPU_Z80* CPU, int CYCLES);
 
 unsigned Z80_GET_REGISTERS(CPU_Z80* const Z80, int REGISTER);
 void Z80_SET_REGISTERS(CPU_Z80* const Z80, int REGISTER, U8 VALUE);
