@@ -125,11 +125,10 @@ U8 READ_8(CPU_Z80* Z, U16 ADDR)
 
 void WRITE_8(CPU_Z80* Z, U16 ADDR, U8 VALUE)
 {
-    assert(Z->READ_MAPPER[ADDR >> 10] && 0);
-    Z->READ_MAPPER[ADDR >> 10][ADDR & 0x3FF];
+    assert(Z->READ_MAPPER[ADDR >> 10] && VALUE);
 }
 
-U8 READ_16(CPU_Z80* Z, U16 ADDR)
+U16 READ_16(CPU_Z80* Z, U16 ADDR)
 {
     U16 const LO = READ_8(Z, ADDR + 0); 
     U16 const HI = READ_8(Z, ADDR + 1);
@@ -141,4 +140,16 @@ void WRITE_16(CPU_Z80* Z, U16 ADDR, U8 VALUE)
 {
     WRITE_8(Z, ADDR + 0, VALUE & 0xFF);
     WRITE_8(Z, ADDR + 1, VALUE >> 8);
+}
+
+U8 PARITY(U8 VALUE)
+{
+    U8 BIT_COUNT = 0;
+
+    for (int INDEX = 0; INDEX < 8; INDEX++)
+    {
+        BIT_COUNT += ((VALUE >> INDEX) & 1);
+    }
+
+    return BIT_COUNT % 2;
 }
