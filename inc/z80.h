@@ -103,6 +103,8 @@
 #define         Z80_P_FLAG              Z80_PV_FLAG
 #define         Z80_V_FLAG              Z80_PV_FLAG
 
+#define         Z80_UNUSED(X) (void)X
+
 
 #define         CALC_VFLAG_8(ADDRESS, VALUE, RESULT) \
     (((ADDRESS & 0x80) == (VALUE & 0x80)) && ((ADDRESS & 0x80) != (RESULT & 0x80)))
@@ -144,7 +146,7 @@ typedef struct Z80_MEMORY
 
 typedef struct CPU_Z80
 {
-    struct Z80_MEMORY Z80_MEM[Z80_BASE_BITMASK];
+    struct Z80_MEMORY Z80_MEM;
 
     U16 CYCLES;
     U16 PC;
@@ -158,6 +160,7 @@ typedef struct CPU_Z80
     unsigned HALT : 1;
     unsigned INT_PENDING : 1;
     unsigned NMI_PENDING : 1;
+    unsigned EI_DELAY : 1;
 
     U16 REGISTER_BASE[16];
 
@@ -187,44 +190,12 @@ void Z80_INIT(CPU_Z80* const Z80);
 void Z80_RUN(CPU_Z80* const Z80);
 void Z80_OUTPUT(CPU_Z80* const Z80);
 
-void Z80_EXEC(CPU_Z80* const Z80, U8 OPCODE);
+void Z80_EXEC(CPU_Z80* Z80);
 
 unsigned Z80_GET_REGISTERS(CPU_Z80* const Z80, int REGISTER);
 void Z80_SET_REGISTERS(CPU_Z80* const Z80, int REGISTER, U8 VALUE);
 void Z80_STEP(CPU_Z80* const Z80);
 void Z80_GEN_NMI(CPU_Z80* const Z80);
 void Z80_GEN_INT_DATA(CPU_Z80* const Z80);
-
-/*===============================================================================*/
-/*-------------------------------------------------------------------------------*/
-//                      Z80 EXTERNAL READ AND WRITE FUNCTIONS
-/*-------------------------------------------------------------------------------*/
-/*===============================================================================*/
-
-extern U8 Z80_READ_BYTE(Z80_MEMORY* const Z, U16 ADDR)
-{
-    return Z->READ_8(Z->USER_DATA, ADDR);
-}
-
-extern U16 Z80_READ_WORD(Z80_MEMORY* const Z, U16 ADDR)
-{
-    return (Z->READ_8(Z->USER_DATA, ADDR + 1) << 8) | Z->READ_8(Z->USER_DATA, ADDR);
-}
-
-extern void Z80_WRITE_BYTE(Z80_MEMORY* const Z, U16 ADDR, U8 VAL)
-{
-    Z->WRITE_8(Z->USER_DATA, ADDR, VAL);
-}
-
-extern void Z80_WRITE_WORD(Z80_MEMORY* const Z, U16 ADDR, U8 VAL)
-{
-    Z->WRITE_8(Z->USER_DATA, ADDR, VAL & 0xFF);
-    Z->WRITE_8(Z->USER_DATA, ADDR + 1, VAL >> 8);
-}
-
-extern void Z80_INCR_READ(CPU_Z80* const Z80)
-{
-    Z80->MEMORY_REFRESH = (Z80->MEMORY_REFRESH & 0x80) | ((Z80->MEMORY_REFRESH + 1) & 0x7F);
-}
 
 #endif
