@@ -105,7 +105,6 @@
 
 #define         Z80_UNUSED(X) (void)X
 
-
 #define         CALC_VFLAG_8(ADDRESS, VALUE, RESULT) \
     (((ADDRESS & 0x80) == (VALUE & 0x80)) && ((ADDRESS & 0x80) != (RESULT & 0x80)))
 
@@ -134,12 +133,10 @@
 
 typedef struct Z80_MEMORY
 {
-    unsigned(*MEMORY_BASE);
-    U8(*READ_8)(void*, U16);
-    U16* READ_16;
-    void(*WRITE_8)(void*, U16, U8);
-    void(*WRITE_16)(void*, U16, U8);
-
+    U8 (*READ_8)(void* USER_DATA, U16 ADDR);
+    U16 (*READ_16)(void* USER_DATA, U16 ADDR);
+    void (*WRITE_8)(void* USER_DATA, U16 ADDR, U8 VAL);
+    void (*WRITE_16)(void* USER_DATA, U16 ADDR, U16 VAL);
     void* USER_DATA;
 
 } Z80_MEMORY;
@@ -190,7 +187,7 @@ void Z80_INIT(CPU_Z80* const Z80);
 void Z80_RUN(CPU_Z80* const Z80);
 void Z80_OUTPUT(CPU_Z80* const Z80);
 
-void Z80_EXEC(CPU_Z80* Z80);
+void Z80_EXEC(CPU_Z80* cpu, int cycles);
 
 unsigned Z80_GET_REGISTERS(CPU_Z80* const Z80, int REGISTER);
 void Z80_SET_REGISTERS(CPU_Z80* const Z80, int REGISTER, U8 VALUE);
