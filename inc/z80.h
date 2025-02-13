@@ -134,7 +134,7 @@
 
 typedef struct CPU_Z80
 {
-    const U8* READ_MAPPER[0x10000 / 0x400];
+    U8* READ_MAPPER[0x10000 / 0x400];
     U8* WRITE_MAPPER[0x10000 / 0x400];
 
     U16 CYCLES;
@@ -181,8 +181,6 @@ typedef struct CPU_Z80
 void Z80_INIT(CPU_Z80* const Z80);
 void Z80_RUN(CPU_Z80* const Z80);
 void Z80_OUTPUT(CPU_Z80* const Z80);
-
-void Z80_EXEC(CPU_Z80* CPU);
 
 unsigned Z80_GET_REGISTERS(CPU_Z80* const Z80, int REGISTER);
 void Z80_SET_REGISTERS(CPU_Z80* const Z80, int REGISTER, U8 VALUE);
