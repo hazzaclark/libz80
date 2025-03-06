@@ -26,6 +26,12 @@
 //                  Z80 STACK MANAGEMENT FUNCTIONS
 //========================================================================
 
+Z80_MAKE_OPCODE(NOP)
+{
+    Z80_UNUSED(VALUE);
+    Z->PC = 0;
+}
+
 Z80_MAKE_OPCODE(PUSH)
 {
     WRITE_8(Z, Z->SP, VALUE >> 8 & 0xFF);
@@ -494,6 +500,24 @@ Z80_MAKE_OPCODE(LDDR)
     }
 }
 
+Z80_MAKE_OPCODE(LD_A_B)
+{
+    (void)VALUE;
+    Z80_SET_REGISTERS(Z, Z80_A, Z80_GET_REGISTERS(Z, Z80_B));
+}
+
+Z80_MAKE_OPCODE(LD_A_C)
+{
+    (void)VALUE;
+    Z80_SET_REGISTERS(Z, Z80_A, Z80_GET_REGISTERS(Z, Z80_C));
+}
+
+Z80_MAKE_OPCODE(LD_A_IMM)
+{
+    VALUE = READ_8(Z, Z->PC++);
+    Z80_SET_REGISTERS(Z, Z80_A, VALUE);
+}
+
 Z80_MAKE_OPCODE(SUB)
 {
     U8 RESULT = Z80_A - VALUE;
@@ -731,5 +755,22 @@ U8 Z80_GET_OPCODE_CYCLES(U8 OPCODE)
             return (OPCODE & Z80_OPCODE_MASK) ? 0x06 : ((OPCODE & 0xC7) == 0x06) ? 0x07 : 0x04;   
     }
 }
+
+// BUILD THE ENCOMPASSING OPCODE TABLE
+// THIS WILL REPLACE THE SWITCH CASE IN main.c
+
+OPCODE_HANDLER BUILD_OPCODE_TABLE[] =
+{
+    { .FUNCTION_PTRS.HANDLER = NOP,     .MASK = 0x00, .TYPE = 0},
+    { .FUNCTION_PTRS.HANDLER = PUSH,    .MASK = 0xC5, .TYPE = 0 },  // PUSH BC
+    { .FUNCTION_PTRS.HANDLER_16 = POP,  .MASK = 0xC1, .TYPE = 2 },  // POP BC
+    { .FUNCTION_PTRS.HANDLER = JR,      .MASK = 0x18, .TYPE = 0 },  // JR
+    { .FUNCTION_PTRS.HANDLER = LD_A_B,  .MASK = 0x78, .TYPE = 0 },  // LD A, B
+    { .FUNCTION_PTRS.HANDLER = LD_A_C,  .MASK = 0x79, .TYPE = 0 },  // LD A, C
+    { .FUNCTION_PTRS.HANDLER = LD_A_IMM, .MASK = 0x3E, .TYPE = 0 }, // LD A, IMM
+    { .FUNCTION_PTRS.HANDLER_8 = INC,   .MASK = 0x04, .TYPE = 1 },  // INC B
+    { .FUNCTION_PTRS.HANDLER_8 = DEC,   .MASK = 0x05, .TYPE = 1 },  // DEC B
+    { .FUNCTION_PTRS.HANDLER_16 = NEXTW, .MASK = 0x01, .TYPE = 2 }, // NEXTW
+};
 
 #endif
