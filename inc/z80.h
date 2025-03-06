@@ -178,8 +178,21 @@ typedef struct CPU_Z80
 /*-------------------------------------------------------------------------------*/
 /*===============================================================================*/
 
-typedef void(*OPCODE_FUNCTION)(CPU_Z80*, U8);
+typedef struct OPCODE_HANDLER
+{
+    union FUNCTION_PTRS
+    {
+        void (*HANDLER)(CPU_Z80*, U16);   
+        U16 (*HANDLER_8)(CPU_Z80*);       
+        U16 (*HANDLER_16)(CPU_Z80*);      
+    } FUNCTION_PTRS; 
 
+    unsigned MASK;
+    int TYPE;
+
+} OPCODE_HANDLER;
+
+extern OPCODE_HANDLER BUILD_OPCODE_TABLE[256];
 void Z80_INIT(CPU_Z80* const Z80);
 void Z80_RUN(CPU_Z80* const Z80);
 void Z80_OUTPUT(CPU_Z80* const Z80);
