@@ -38,6 +38,14 @@ libz80.so
 
 the makefile in question is universal, allowing for ease of use compiling on other systems
 
+# Simulator:
+
+The simulator in question is a pre-baked, 8 bit program designed to LOAD from the value of the second operand into the first
+After which, the CPU halts, displays the final state
+
+![image](https://github.com/user-attachments/assets/577cdf36-4b42-44e8-a4c7-163a139a49b7)
+
+
 # Resources:
 
 [Z80 PROGRAMMER MANUAL](https://www.zilog.com/docs/z80/um0080.pdf)
