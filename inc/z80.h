@@ -178,6 +178,8 @@ typedef struct CPU_Z80
 /*-------------------------------------------------------------------------------*/
 /*===============================================================================*/
 
+typedef void(*OPCODE_FUNCTION)(CPU_Z80*, U8);
+
 void Z80_INIT(CPU_Z80* const Z80);
 void Z80_RUN(CPU_Z80* const Z80);
 void Z80_OUTPUT(CPU_Z80* const Z80);
