@@ -22,44 +22,44 @@
 
 void EXECUTE_OPCODE(CPU_Z80* Z, U8 OPCODE)
 {
-    switch (OPCODE)
+    for (size_t i = 0; i < sizeof(BUILD_OPCODE_TABLE) / sizeof(BUILD_OPCODE_TABLE[0]); i++)
     {
-        case 0x00:
-            printf("NOP\n");
-            break;
+        if (BUILD_OPCODE_TABLE[i].MASK == OPCODE)
+        {
+            printf("Executing Opcode: 0x%02X\n", OPCODE);
+            switch (BUILD_OPCODE_TABLE[i].TYPE)
+            {
+                case 0: 
+                    BUILD_OPCODE_TABLE[i].FUNCTION_PTRS.HANDLER(Z, OPCODE);
+                    break;
 
-        // LD A, N
-        case 0x3E:
-            printf("LD A, 0x%02X\n", READ_8(Z, Z->PC));
-            Z80_SET_REGISTERS(Z, Z80_A, READ_8(Z, Z->PC)); 
-            Z->PC++;
-            break;
+                case 1:  
+                    {
+                        U8 RESULT = BUILD_OPCODE_TABLE[i].FUNCTION_PTRS.HANDLER_8(Z);
+                        printf("8 BIT RESULT: 0x%02X\n", RESULT);
+                    }
+                    break;
 
-        // LD B, N
-        case 0x06:
-            printf("LD B, 0x%02X\n", READ_8(Z, Z->PC));
-            Z80_SET_REGISTERS(Z, Z80_B, READ_8(Z, Z->PC));
-            Z->PC++;
-            break;
+                case 2:  
+                    {
+                        U16 RESULT = BUILD_OPCODE_TABLE[i].FUNCTION_PTRS.HANDLER_16(Z);
+                        printf("16 BIT RESULT: 0x%04X\n", RESULT);
+                    }
+                    break;
 
-        // LD C, N
-        case 0x0E:
-            printf("LD C, 0x%02X\n", READ_8(Z, Z->PC));
-            Z80_SET_REGISTERS(Z, Z80_C, READ_8(Z, Z->PC)); 
-            Z->PC++;
-            break;
+                default:
+                    break;
+            }
 
-        // HALT
-        case 0x76:
-            printf("HALT\n");
-            Z->HALT = 1;
-            break;
-
-        default: break;
+            Z80_OUTPUT(Z);
+            return;
+        }
     }
 
+    printf("UNKNOWN OPCODE: 0x%02X\n", OPCODE);
     Z80_OUTPUT(Z);
 }
+
 
 // SIMPLE LOAD INTO MEMORY IN ACCORDANCE WITH THE MAX SIZE
 
@@ -88,6 +88,7 @@ int main(void)
         0x3E, 0x42,       // LD A, 0x42
         0x06, 0x10,       // LD B, 0x10
         0x0E, 0x20,       // LD C, 0x20
+        0x01, 0x30,
         0x76              // HALT
     };
 
