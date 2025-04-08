@@ -26,7 +26,7 @@ void EXECUTE_OPCODE(CPU_Z80* Z, U8 OPCODE)
     {
         if (BUILD_OPCODE_TABLE[i].MASK == OPCODE)
         {
-            printf("Executing Opcode: 0x%02X\n", OPCODE);
+            printf("EXECUTING OPCODE: 0x%02X\n", OPCODE);
             switch (BUILD_OPCODE_TABLE[i].TYPE)
             {
                 case 0: 
@@ -81,14 +81,18 @@ int main(void)
     CPU_Z80 Z80;
     Z80_INIT(&Z80);
 
-    printf("Z80 is Running: %p\n", (void*)&Z80);
+    printf("Z80 IS RUNNING: %p\n", (void*)&Z80);
 
     U8 TEST_PROGRAM[] = 
     {
         0x3E, 0x42,       // LD A, 0x42
         0x06, 0x10,       // LD B, 0x10
         0x0E, 0x20,       // LD C, 0x20
-        0x01, 0x30,
+        0x80,             // ADD A, B       
+        0x91,             // SUB C           
+        0xFE, 0x32,       // CP 0x32         
+        0x28, 0x02,       // JR Z, +2        
+        0x3E, 0x00,       // LD A, 0x00    
         0x76              // HALT
     };
 
