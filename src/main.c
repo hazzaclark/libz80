@@ -110,7 +110,7 @@ int main(void)
         }
     }
 
-    printf("Final CPU State:\n");
+    printf("FINAL CPU STATE:\n");
     Z80_OUTPUT(&Z80);
 
     for (int INDEX = 0; INDEX < 64; INDEX++)
