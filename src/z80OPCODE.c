@@ -830,7 +830,7 @@ OPCODE_HANDLER BUILD_OPCODE_TABLE[] =
     { .FUNCTION_PTRS.HANDLER = LD_A_IMM,    .MASK = 0x3E, .TYPE = 0 },  // LD A, IMM
     { .FUNCTION_PTRS.HANDLER = LD_B_IMM,    .MASK = 0x06, .TYPE = 0 },  // LD B, IMM
     { .FUNCTION_PTRS.HANDLER = LD_C_IMM,    .MASK = 0x0E, .TYPE = 0 },  // LD C, IMM
-    { .FUNCTION_PTRS.HANDLER = SUB,         .MASK = 0x90, .TYPE = 0 },  // SUB A, B
+    { .FUNCTION_PTRS.HANDLER = SUB,         .MASK = 0x91, .TYPE = 0 },  // SUB A, B
     { .FUNCTION_PTRS.HANDLER = NEG,         .MASK = 0xED44, .TYPE = 0 }, // NEG
     { .FUNCTION_PTRS.HANDLER = OR,          .MASK = 0xB0, .TYPE = 0 },  // OR A, B
     { .FUNCTION_PTRS.HANDLER = OUTI_OUTD,   .MASK = 0xA3, .TYPE = 0 },  // OUTI
