@@ -189,6 +189,7 @@ typedef struct OPCODE_HANDLER
 
     unsigned MASK;
     int TYPE;
+    const char* NAME;
 
 } OPCODE_HANDLER;
 
