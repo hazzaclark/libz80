@@ -20,7 +20,7 @@ void EXECUTE_OPCODE(CPU_Z80* Z, U8 OPCODE)
     {
         if (BUILD_OPCODE_TABLE[i].MASK == OPCODE)
         {
-            printf("EXECUTING OPCODE: %-8s, 0x%02X\n", BUILD_OPCODE_TABLE[i].NAME, OPCODE);
+            printf("EXECUTING OPCODE: %s MASK: 0x%02X\n", BUILD_OPCODE_TABLE[i].NAME, OPCODE);
             switch (BUILD_OPCODE_TABLE[i].TYPE)
             {
                 case 0: 
