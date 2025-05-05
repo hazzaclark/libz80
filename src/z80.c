@@ -101,18 +101,28 @@ void Z80_INIT(CPU_Z80* const Z80)
 
 void Z80_OUTPUT(CPU_Z80* const Z80)
 {
-    printf("PC: %04X, AF: %04X, BC: %04X, DE: %04X, HL: %04X, SP: %04X, "
-           "IX: %04X, IY: %04X, I: %02X, R: %02X\n",
+    printf("PC: %04X, AF: %04X (A: %02X F: %02X), BC: %04X (B: %02X C: %02X), "
+           "DE: %04X (D: %02X E: %02X), HL: %04X (H: %02X L: %02X)\n"
+           "SP: %04X, IX: %04X, IY: %04X, I: %02X, R: %02X\n",
            Z80->PC,
            (Z80_GET_REGISTERS(Z80, Z80_A) << 8) | Z80_GET_REGISTERS(Z80, Z80_F),
-           (Z80_GET_REGISTERS(Z80, Z80_B) << 8) | Z80_GET_REGISTERS(Z80, Z80_C), 
-           (Z80_GET_REGISTERS(Z80, Z80_D) << 8) | Z80_GET_REGISTERS(Z80, Z80_E), 
+           Z80_GET_REGISTERS(Z80, Z80_A),
+           Z80_GET_REGISTERS(Z80, Z80_F),
+           (Z80_GET_REGISTERS(Z80, Z80_B) << 8) | Z80_GET_REGISTERS(Z80, Z80_C),
+           Z80_GET_REGISTERS(Z80, Z80_B),
+           Z80_GET_REGISTERS(Z80, Z80_C),
+           (Z80_GET_REGISTERS(Z80, Z80_D) << 8) | Z80_GET_REGISTERS(Z80, Z80_E),
+           Z80_GET_REGISTERS(Z80, Z80_D),
+           Z80_GET_REGISTERS(Z80, Z80_E),
            (Z80_GET_REGISTERS(Z80, Z80_H) << 8) | Z80_GET_REGISTERS(Z80, Z80_L),
+           Z80_GET_REGISTERS(Z80, Z80_H),
+           Z80_GET_REGISTERS(Z80, Z80_L),
            Z80->SP,
            (Z80_GET_REGISTERS(Z80, Z80_IXH) << 8) | Z80_GET_REGISTERS(Z80, Z80_IXL),
            (Z80_GET_REGISTERS(Z80, Z80_IYH) << 8) | Z80_GET_REGISTERS(Z80, Z80_IYL),
            Z80_GET_REGISTERS(Z80, Z80_I),
-           Z80_GET_REGISTERS(Z80, Z80_R)
+           Z80_GET_REGISTERS(Z80, Z80_R),
+           printf("=======================================================\n")
     );
 }
 
