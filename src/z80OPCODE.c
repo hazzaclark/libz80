@@ -510,20 +510,26 @@ Z80_MAKE_OPCODE(LD_A_C)
 
 Z80_MAKE_OPCODE(LD_A_IMM)
 {
-    VALUE = READ_8(Z, Z->PC++);
-    Z80_SET_REGISTERS(Z, Z80_A, VALUE);
+    (void)VALUE;
+    U8 IMM = READ_8(Z, Z->PC);
+    Z->PC++;
+    Z80_SET_REGISTERS(Z, Z80_A, IMM);
 }
 
 Z80_MAKE_OPCODE(LD_B_IMM)
 {
-    VALUE = READ_8(Z, Z->PC++);
-    Z80_SET_REGISTERS(Z, Z80_B, VALUE);
+    (void)VALUE;
+    U8 IMM = READ_8(Z, Z->PC);
+    Z->PC++;
+    Z80_SET_REGISTERS(Z, Z80_B, IMM);
 }
 
 Z80_MAKE_OPCODE(LD_C_IMM)
 {
-    VALUE = READ_8(Z, Z->PC++);
-    Z80_SET_REGISTERS(Z, Z80_C, VALUE);
+    (void)VALUE;
+    U8 IMM = READ_8(Z, Z->PC);
+    Z->PC++;
+    Z80_SET_REGISTERS(Z, Z80_B, IMM);
 }
 
 Z80_MAKE_OPCODE(SUB)
