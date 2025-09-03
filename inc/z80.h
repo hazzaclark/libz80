@@ -117,10 +117,10 @@
 #define         IS_BIT_SET(VALUE, BIT)      (!!((VALUE) & (1 << (BIT))))
 
 
-#define         Z80_GET_PAIR(Z80, HI, LO) \
+#define         Z80_GET_PAIR(HI, LO) \
                 ((Z80_GET_REGISTERS(Z80, HI) << 8) | Z80_GET_REGISTERS(Z80, LO))
 
-                #define Z80_SET_PAIR(Z80, HI, LO, VALUE) \
+                #define Z80_SET_PAIR(HI, LO, VALUE) \
                 do { \
                     Z80_SET_REGISTERS(Z80, HI, ((VALUE) >> 8) & 0xFF); \
                     Z80_SET_REGISTERS(Z80, LO, (VALUE) & 0xFF); \
@@ -193,6 +193,7 @@ typedef struct OPCODE_HANDLER
 
 } OPCODE_HANDLER;
 
+extern CPU_Z80* Z80;
 extern OPCODE_HANDLER BUILD_OPCODE_TABLE[256];
 void Z80_INIT(CPU_Z80* const Z80);
 void Z80_RUN(CPU_Z80* const Z80);
