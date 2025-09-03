@@ -12,6 +12,14 @@ Such is the case with one of the many ambitions, is to aid in the audio processi
 
 Created using ANSI C99 standard, this project aims to promote an ease of use means of creating a library that emulates the likeness of these microprocessors
 
+## Disclaimer!:
+
+Despite the aforementioned description, this emulator is proposed more as a "toy-emulator" to test out and to mess around with nuances to do with the Z80.
+
+This is due to the lack of fine-tuning to lot of the implementation (it's mostly stuff thrown at the wall and see what sticks)
+
+Any and all subsequent use of this library should be taken with pre-emptive caution
+
 # Usage:
 
 ```
